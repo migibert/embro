@@ -1,7 +1,8 @@
 package com.migibert.embro.domain.model;
 
-public enum Seniority {
-    JUNIOR,
-    MEDIUM,
-    SENIOR
+import java.util.UUID;
+
+public record Seniority(
+        UUID organizationId,
+        String name) {
 }

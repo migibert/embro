@@ -13,6 +13,6 @@ public record Collaborator(
         String role,
         Date birthDate,
         Date startDate,
-        Seniority seniority,
+        SeniorityLevel seniority,
         List<SkillLevel> skills) {
 }
