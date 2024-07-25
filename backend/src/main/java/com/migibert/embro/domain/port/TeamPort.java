@@ -2,15 +2,15 @@ package com.migibert.embro.domain.port;
 
 import com.migibert.embro.domain.model.Team;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface TeamPort {
     Team save(Team team);
 
-    void delete(UUID teamId);
+    void deleteById(UUID teamId);
 
-    Team findById(UUID teamId);
+    Optional<Team> findById(UUID teamId);
 
-    List<Team> findAll();
+    Iterable<Team> findAll();
 }

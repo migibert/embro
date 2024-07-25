@@ -3,11 +3,13 @@ package com.migibert.embro.domain.service;
 import com.migibert.embro.domain.model.Skill;
 import com.migibert.embro.domain.port.SkillPort;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
+@Service
 public class SkillService {
 
     private final SkillPort port;
@@ -17,14 +19,14 @@ public class SkillService {
     }
 
     public void delete(UUID skillId) {
-        this.port.delete(skillId);
+        this.port.deleteById(skillId);
     }
 
-    public Skill findById(UUID id) {
+    public Optional<Skill> findById(UUID id) {
         return this.port.findById(id);
     }
 
-    public List<Skill> findAll() {
+    public Iterable<Skill> findAll() {
         return this.port.findAll();
     }
 }

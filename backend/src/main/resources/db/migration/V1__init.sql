@@ -30,7 +30,6 @@ CREATE TABLE COLLABORATOR(
     birth_date DATETIME,
     start_date DATETIME,
     seniority_id UUID NOT NULL,
-    seniority_level INTEGER NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT fk_collaborator_seniority FOREIGN KEY (seniority_id) REFERENCES seniority(id)
 );

@@ -3,11 +3,13 @@ package com.migibert.embro.domain.service;
 import com.migibert.embro.domain.model.Team;
 import com.migibert.embro.domain.port.TeamPort;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
+@Service
 public class TeamService {
     private final TeamPort port;
 
@@ -16,14 +18,14 @@ public class TeamService {
     }
 
     public void delete(UUID teamId) {
-        this.port.delete(teamId);
+        this.port.deleteById(teamId);
     }
 
-    public Team findById(UUID teamId) {
+    public Optional<Team> findById(UUID teamId) {
         return this.port.findById(teamId);
     }
 
-    public List<Team> findAll() {
+    public Iterable<Team> findAll() {
         return this.port.findAll();
     }
 }
