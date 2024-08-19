@@ -5,6 +5,7 @@ import com.migibert.embro.domain.port.OrganizationPort;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,7 +31,7 @@ public class OrganizationService {
         return this.port.findById(organizationId);
     }
 
-    public Iterable<Organization> findAll() {
+    public List<Organization> findAll() {
         return this.port.findAll();
     }
 }

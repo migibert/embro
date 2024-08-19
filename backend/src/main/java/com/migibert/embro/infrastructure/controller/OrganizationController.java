@@ -3,7 +3,6 @@ package com.migibert.embro.infrastructure.controller;
 import com.migibert.embro.domain.model.Organization;
 import com.migibert.embro.domain.service.OrganizationService;
 import lombok.AllArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +17,7 @@ public class OrganizationController {
 
     private final OrganizationService service;
 
-    @RequestMapping("/")
+    @GetMapping("/")
     public ResponseEntity list() {
         Iterable<Organization> organizations = service.findAll();
         return ResponseEntity.ok(organizations);

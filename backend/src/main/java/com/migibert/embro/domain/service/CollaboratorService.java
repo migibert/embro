@@ -14,19 +14,37 @@ import java.util.UUID;
 public class CollaboratorService {
     private final CollaboratorPort port;
 
-    public Collaborator save(Collaborator collaborator) {
-        return this.port.save(collaborator);
+    public Collaborator create(UUID organizationId, Collaborator collaborator) {
+        UUID id = UUID.randomUUID();
+        return this.port.create(
+            organizationId,
+            new Collaborator(
+                id,
+                collaborator.email(),
+                collaborator.firstname(),
+                collaborator.lastname(),
+                collaborator.role(),
+                collaborator.birthDate(),
+                collaborator.startDate(),
+                collaborator.seniority(),
+                collaborator.skills()
+            )
+        );
     }
 
-    public void delete(UUID collaboratorId) {
-        this.port.deleteById(collaboratorId);
+    public Collaborator update(UUID organizationId, Collaborator collaborator) {
+        return this.port.update(organizationId, collaborator);
     }
 
-    public Optional<Collaborator> findById(UUID collaboratorId) {
-        return this.port.findById(collaboratorId);
+    public void delete(UUID organizationId, UUID collaboratorId) {
+        this.port.deleteById(organizationId, collaboratorId);
     }
 
-    public Iterable<Collaborator> findAll() {
-        return this.port.findAll();
+    public Optional<Collaborator> findById(UUID organizationId, UUID collaboratorId) {
+        return this.port.findById(organizationId, collaboratorId);
+    }
+
+    public List<Collaborator> findAll(UUID organizationId) {
+        return this.port.findAll(organizationId);
     }
 }

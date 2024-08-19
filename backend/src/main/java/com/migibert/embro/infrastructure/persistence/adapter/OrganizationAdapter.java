@@ -2,62 +2,64 @@ package com.migibert.embro.infrastructure.persistence.adapter;
 
 import com.migibert.embro.domain.model.Organization;
 import com.migibert.embro.domain.port.OrganizationPort;
-import com.migibert.embro.infrastructure.persistence.model.OrganizationTable;
-import lombok.AllArgsConstructor;
-import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
+import com.migibert.embro.infrastructure.persistence.model.tables.records.OrganizationRecord;
+import org.jooq.DSLContext;
+import org.jooq.impl.QOM;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-@AllArgsConstructor
+import static com.migibert.embro.infrastructure.persistence.model.Tables.ORGANIZATION;
+import static org.jooq.impl.DSL.count;
+import static org.jooq.impl.DSL.or;
+
 @Component
 public class OrganizationAdapter implements OrganizationPort {
-    private OrganizationRepository repository;
-    private JdbcAggregateTemplate template;
 
-    @Override
+    private DSLContext context;
+    public OrganizationAdapter(DSLContext context) {
+        this.context = context;
+    }
+
     public Organization save(Organization organization) {
-        Optional<OrganizationTable> existing = repository.findById(organization.id());
-        OrganizationTable toSave = toPersistenceModel(organization);
-        if(existing.isEmpty()) {
-            template.insert(toSave);
-        } else {
-            template.update(toSave);
-        }
-        return organization;
+        OrganizationRecord record = this.context
+                .insertInto(ORGANIZATION)
+                .columns(ORGANIZATION.ID, ORGANIZATION.NAME)
+                .values(organization.id(), organization.name())
+                .returning()
+                .fetchOne();
+
+        return toDomainModel(record);
     }
 
-    @Override
     public void deleteById(UUID organizationId) {
-        repository.deleteById(organizationId);
+        this.context.deleteFrom(ORGANIZATION).where(ORGANIZATION.ID.eq(organizationId));
     }
 
-    @Override
     public Optional<Organization> findById(UUID organizationId) {
-        Optional<OrganizationTable> found = repository.findById(organizationId);
-        if(found.isEmpty()) {
+        int existing = this.context
+                .selectCount()
+                .from(ORGANIZATION)
+                .where(ORGANIZATION.ID.eq(organizationId))
+                .fetchOne(0, int.class);
+        if(existing == 0) {
             return Optional.empty();
         }
-        return Optional.of(toDomainModel(found.get()));
+        OrganizationRecord record = this.context
+                .selectFrom(ORGANIZATION)
+                .where(ORGANIZATION.ID.eq(organizationId))
+                .fetchAny();
+        return Optional.of(toDomainModel(record));
     }
 
-    @Override
     public List<Organization> findAll() {
-        Iterable<OrganizationTable> found = repository.findAll();
-        return StreamSupport.stream(found.spliterator(), false)
-                            .map(this::toDomainModel)
-                            .collect(Collectors.toList());
+        return this.context.selectFrom(ORGANIZATION).stream().map(this::toDomainModel).collect(Collectors.toList());
     }
 
-    private OrganizationTable toPersistenceModel(Organization organization) {
-        return new OrganizationTable(organization.id(), organization.name());
-    }
-
-    private Organization toDomainModel(OrganizationTable table) {
-        return new Organization(table.getId(), table.getName());
+    private Organization toDomainModel(OrganizationRecord record) {
+        return new Organization(record.getId(), record.getName());
     }
 }

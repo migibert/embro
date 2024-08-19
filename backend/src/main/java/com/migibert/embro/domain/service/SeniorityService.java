@@ -5,6 +5,7 @@ import com.migibert.embro.domain.port.SeniorityPort;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,19 +15,24 @@ import java.util.UUID;
 public class SeniorityService {
     private final SeniorityPort port;
 
-    public Seniority save(Seniority seniority) {
-        return this.port.save(seniority);
+    public Seniority update(UUID organizationId, Seniority seniority) {
+        return this.port.save(organizationId, seniority);
     }
 
-    public void delete(UUID seniorityId) {
-        this.port.deleteById(seniorityId);
+    public void delete(UUID organizationId, UUID seniorityId) {
+        this.port.deleteById(organizationId, seniorityId);
     }
 
-    public Optional<Seniority> findById(UUID seniorityId) {
-        return this.port.findById(seniorityId);
+    public Optional<Seniority> findById(UUID organizationId, UUID seniorityId) {
+        return this.port.findById(organizationId, seniorityId);
     }
 
-    public Iterable<Seniority> findAll() {
-        return this.port.findAll();
+    public List<Seniority> findAll(UUID organizationId) {
+        return this.port.findAll(organizationId);
+    }
+
+    public Seniority create(UUID organizationId, Seniority seniority) {
+        UUID id = UUID.randomUUID();
+        return this.port.save(organizationId, new Seniority(id, seniority.name()));
     }
 }

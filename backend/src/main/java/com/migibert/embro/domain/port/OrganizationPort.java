@@ -2,6 +2,7 @@ package com.migibert.embro.domain.port;
 
 import com.migibert.embro.domain.model.Organization;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,5 +13,5 @@ public interface OrganizationPort {
 
     Optional<Organization> findById(UUID organizationId);
 
-    Iterable<Organization> findAll();
+    List<Organization> findAll();
 }
