@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -44,7 +45,11 @@ public class CollaboratorService {
         return this.port.findById(organizationId, collaboratorId);
     }
 
-    public List<Collaborator> findAll(UUID organizationId) {
+    public Set<Collaborator> findByTeam(UUID organizationId, UUID teamId) {
+        return this.port.findByTeam(organizationId, teamId);
+    }
+
+    public Set<Collaborator> findAll(UUID organizationId) {
         return this.port.findAll(organizationId);
     }
 }

@@ -59,4 +59,22 @@ public class TeamController {
         teamService.delete(organizationId, id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{teamId}/members/")
+    public ResponseEntity listMembers(@PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID id) {
+        Set<Collaborator> members = collaboratorService.findByTeam(organizationId, id);
+        return ResponseEntity.ok(members);
+    }
+
+    @PutMapping("/{teamId}/members/{memberId}")
+    public ResponseEntity addMember(@PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID teamId, @PathVariable("memberId") UUID memberId) {
+        teamService.addMember(organizationId, teamId, memberId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{teamId}/members/{memberId}")
+    public ResponseEntity removeMember(@PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID teamId, @PathVariable("memberId") UUID memberId) {
+        teamService.removeMember(organizationId, teamId, memberId);
+        return ResponseEntity.noContent().build();
+    }
 }

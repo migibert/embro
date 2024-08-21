@@ -21,10 +21,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -101,6 +99,19 @@ class EmbroApplicationTests {
 		return create("/organizations/" + organization.id() + "/teams/", team, Team.class);
 	}
 
+	private <T> void expectBodyToBe(String uri, T expected, Class<T> clazz) throws Exception {
+		MvcResult result = mvc.perform(get(uri)).andReturn();
+		T found = mapper.readValue(result.getResponse().getContentAsString(), clazz);
+		Assertions.assertEquals(expected, found);
+	}
+
+	private <T> T create(String uri, T value, Class<T> clazz) throws Exception {
+		String json = mapper.writeValueAsString(value);
+		MvcResult result = mvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON).content(json)).andReturn();
+		String response = result.getResponse().getContentAsString();
+		return mapper.readValue(response, clazz);
+	}
+
 	@Test
 	void nominalSetup() throws Exception {
 		expectBodyToBe("/organizations/" + organization.id(), organization, Organization.class);
@@ -114,16 +125,15 @@ class EmbroApplicationTests {
 		expectBodyToBe("/organizations/" + organization.id() + "/collaborators/" + mikael.id(), mikael, Collaborator.class);
 	}
 
-	private <T> void expectBodyToBe(String uri, T expected, Class<T> clazz) throws Exception {
-		MvcResult result = mvc.perform(get(uri)).andReturn();
-		T found = mapper.readValue(result.getResponse().getContentAsString(), clazz);
-		Assertions.assertEquals(expected, found);
-	}
-
-	private <T> T create(String uri, T value, Class<T> clazz) throws Exception {
-		String json = mapper.writeValueAsString(value);
-		MvcResult result = mvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON).content(json)).andReturn();
-		String response = result.getResponse().getContentAsString();
-		return mapper.readValue(response, clazz);
+	@Test
+	void testMembershipManagement() throws Exception {
+		String url = "/organizations/" + organization.id() + "/teams/" + team.id() + "/members/";
+		mvc.perform(get(url)).andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
+		mvc.perform(put(url + mikael.id())).andExpect(status().isNoContent());
+		MvcResult result = mvc.perform(get(url)).andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty()).andReturn();
+		List<Collaborator> value = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+		Assertions.assertEquals(mikael, value.get(0));
+		mvc.perform(delete(url + mikael.id())).andExpect(status().isNoContent());
+		mvc.perform(get(url)).andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
 	}
 }

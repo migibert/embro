@@ -18,8 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.migibert.embro.infrastructure.persistence.model.Tables.COLLABORATOR;
-import static com.migibert.embro.infrastructure.persistence.model.Tables.COLLABORATOR_SKILL;
+import static com.migibert.embro.infrastructure.persistence.model.Tables.*;
 import static org.jooq.impl.DSL.*;
 
 
@@ -60,20 +59,18 @@ public class CollaboratorAdapter implements CollaboratorPort {
     public void deleteById(UUID organizationId, UUID collaboratorId) {
         this.context.deleteFrom(COLLABORATOR).where(COLLABORATOR.ID.eq(collaboratorId)).and(COLLABORATOR.ORGANIZATION_ID.eq(organizationId));
         this.context.deleteFrom(COLLABORATOR_SKILL).where(COLLABORATOR_SKILL.COLLABORATOR_ID.eq(collaboratorId));
+        this.context.deleteFrom(TEAM_COLLABORATOR).where(TEAM_COLLABORATOR.COLLABORATOR_ID.eq(collaboratorId));
     }
 
     @Override
     public Optional<Collaborator> findById(UUID organizationId, UUID collaboratorId) {
         Condition c = COLLABORATOR.ID.eq(collaboratorId);
-        List<Collaborator> collaborators = findByCondition(organizationId, c);
-        if(collaborators.size() == 0) {
-            return Optional.empty();
-        }
-        return Optional.of(collaborators.get(0));
+        Set<Collaborator> collaborators = findByCondition(organizationId, c);
+        return collaborators.stream().findFirst();
     }
 
     @Override
-    public List<Collaborator> findAll(UUID organizationId) {
+    public Set<Collaborator> findAll(UUID organizationId) {
         Condition c = noCondition();
         return findByCondition(organizationId, c);
     }
@@ -105,24 +102,24 @@ public class CollaboratorAdapter implements CollaboratorPort {
 
 
     @Override
-    public List<Collaborator> findByTeam(UUID organizationId, UUID teamID) {
+    public Set<Collaborator> findByTeam(UUID organizationId, UUID teamID) {
         Condition c = COLLABORATOR.team().ID.eq(teamID);
         return findByCondition(organizationId, c);
     }
 
     @Override
-    public List<Collaborator> findBySkill(UUID organizationId, UUID skillId) {
+    public Set<Collaborator> findBySkill(UUID organizationId, UUID skillId) {
         Condition c = COLLABORATOR.skill().ID.eq(skillId);
         return findByCondition(organizationId, c);
     }
 
     @Override
-    public List<Collaborator> findByName(UUID organizationId, String name) {
+    public Set<Collaborator> findByName(UUID organizationId, String name) {
         Condition c = or(COLLABORATOR.FIRSTNAME.eq(name), COLLABORATOR.LASTNAME.eq(name));
         return findByCondition(organizationId, c);
     }
 
-    private List<Collaborator> findByCondition(UUID organizationId, Condition condition) {
+    private Set<Collaborator> findByCondition(UUID organizationId, Condition condition) {
         condition = condition.and(COLLABORATOR.ORGANIZATION_ID.eq(organizationId));
         return this.context
             .select(
@@ -147,6 +144,8 @@ public class CollaboratorAdapter implements CollaboratorPort {
             .from(COLLABORATOR)
             .where(condition)
             .fetch()
-            .map(this::toDomainModel);
+            .map(this::toDomainModel)
+            .stream()
+            .collect(Collectors.toSet());
     }
 }

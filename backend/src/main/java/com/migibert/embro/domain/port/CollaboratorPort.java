@@ -4,6 +4,7 @@ import com.migibert.embro.domain.model.Collaborator;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public interface CollaboratorPort {
@@ -14,11 +15,11 @@ public interface CollaboratorPort {
 
     Optional<Collaborator> findById(UUID organizationId, UUID collaboratorId);
 
-    List<Collaborator> findAll(UUID organizationId);
+    Set<Collaborator> findAll(UUID organizationId);
 
-    List<Collaborator> findByTeam(UUID organizationId, UUID teamID);
+    Set<Collaborator> findByTeam(UUID organizationId, UUID teamID);
 
-    List<Collaborator> findBySkill(UUID organizationId, UUID skillId);
+    Set<Collaborator> findBySkill(UUID organizationId, UUID skillId);
 
-    List<Collaborator> findByName(UUID organizationId, String name);
+    Set<Collaborator> findByName(UUID organizationId, String name);
 }

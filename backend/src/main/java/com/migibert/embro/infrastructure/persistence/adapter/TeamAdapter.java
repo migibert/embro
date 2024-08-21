@@ -1,21 +1,18 @@
 package com.migibert.embro.infrastructure.persistence.adapter;
 
-import com.migibert.embro.domain.model.Seniority;
 import com.migibert.embro.domain.model.Team;
 import com.migibert.embro.domain.port.TeamPort;
-import com.migibert.embro.infrastructure.persistence.model.tables.records.SeniorityRecord;
-import com.migibert.embro.infrastructure.persistence.model.tables.records.SkillRecord;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.TeamRecord;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.migibert.embro.infrastructure.persistence.model.Tables.*;
-import static com.migibert.embro.infrastructure.persistence.model.Tables.SKILL;
 
 @Component
 public class TeamAdapter implements TeamPort {
@@ -58,18 +55,35 @@ public class TeamAdapter implements TeamPort {
         TeamRecord record = this.context
                 .selectFrom(TEAM)
                 .where(TEAM.ID.eq(teamId))
-                .$where(TEAM.ORGANIZATION_ID.eq(organizationId))
+                .and(TEAM.ORGANIZATION_ID.eq(organizationId))
                 .fetchOne();
-        return Optional.of(toDomainModel(record));    }
+        return Optional.of(toDomainModel(record));
+    }
 
-    public List<Team> findAll(UUID organizationId) {
+    public Set<Team> findAll(UUID organizationId) {
         return this.context
                 .selectFrom(TEAM)
                 .where(TEAM.ORGANIZATION_ID.eq(organizationId))
                 .fetch()
                 .stream()
                 .map(this::toDomainModel)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void addMember(UUID organizationId, UUID teamId, UUID memberId) {
+        this.context.insertInto(TEAM_COLLABORATOR)
+                .columns(TEAM_COLLABORATOR.COLLABORATOR_ID, TEAM_COLLABORATOR.TEAM_ID)
+                .values(memberId, teamId)
+                .execute();
+    }
+
+    @Override
+    public void removeMember(UUID organizationId, UUID teamId, UUID memberId) {
+        this.context.deleteFrom(TEAM_COLLABORATOR)
+                .where(TEAM_COLLABORATOR.TEAM_ID.eq(teamId))
+                .and(TEAM_COLLABORATOR.COLLABORATOR_ID.eq(memberId))
+                .execute();
     }
 
     private Team toDomainModel(TeamRecord record) {
