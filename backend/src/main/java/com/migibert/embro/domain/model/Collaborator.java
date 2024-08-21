@@ -1,18 +1,17 @@
 package com.migibert.embro.domain.model;
 
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.Set;
 import java.util.UUID;
 
 public record Collaborator(
-        UUID organizationId,
         UUID id,
         String email,
         String firstname,
         String lastname,
         String role,
-        Date birthDate,
-        Date startDate,
-        SeniorityLevel seniority,
-        List<SkillLevel> skills) {
+        LocalDate birthDate,
+        LocalDate startDate,
+        String seniority,
+        Set<SkillLevel> skills) {
 }

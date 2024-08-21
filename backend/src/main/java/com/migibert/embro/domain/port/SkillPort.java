@@ -3,14 +3,15 @@ package com.migibert.embro.domain.port;
 import com.migibert.embro.domain.model.Skill;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface SkillPort {
-    Skill save(Skill skill);
+    Skill save(UUID organizationId, Skill skill);
 
-    void delete(UUID skillId);
+    void deleteById(UUID organizationId, UUID skillId);
 
-    Skill findById(UUID id);
+    Optional<Skill> findById(UUID organizationId, UUID id);
 
-    List<Skill> findAll();
+    List<Skill> findAll(UUID organizationId);
 }

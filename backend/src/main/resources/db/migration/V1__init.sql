@@ -27,12 +27,10 @@ CREATE TABLE COLLABORATOR(
     firstname VARCHAR(256) NOT NULL,
     lastname VARCHAR(256) NOT NULL,
     role VARCHAR(100) NOT NULL,
-    birth_date DATETIME,
-    start_date DATETIME,
-    seniority_id UUID NOT NULL,
-    seniority_level INTEGER NOT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_collaborator_seniority FOREIGN KEY (seniority_id) REFERENCES seniority(id)
+    birth_date DATE,
+    start_date DATE,
+    seniority_name VARCHAR(100),
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE COLLABORATOR_SKILL(
