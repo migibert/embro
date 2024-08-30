@@ -4,11 +4,13 @@ import com.migibert.embro.domain.model.Collaborator;
 import com.migibert.embro.domain.model.Team;
 import com.migibert.embro.domain.service.CollaboratorService;
 import com.migibert.embro.domain.service.TeamService;
+import com.migibert.embro.domain.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -20,15 +22,24 @@ public class TeamController {
 
     private final TeamService teamService;
     private final CollaboratorService collaboratorService;
+    private final UserService userService;
 
     @GetMapping("/")
-    public ResponseEntity list(@PathVariable("organizationId") UUID organizationId) {
+    public ResponseEntity list(Principal principal, @PathVariable("organizationId") UUID organizationId) {
+        String userId = principal.getName();
+        if(!userService.isAllowed(userId, organizationId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         Iterable<Team> teams = teamService.findAll(organizationId);
         return ResponseEntity.ok(teams);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
+    public ResponseEntity get(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
+        String userId = principal.getName();
+        if(!userService.isAllowed(userId, organizationId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         Optional<Team> team = teamService.findById(organizationId, id);
         if(team.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -37,7 +48,11 @@ public class TeamController {
     }
 
     @PostMapping("/")
-    public ResponseEntity create(@PathVariable("organizationId") UUID organizationId, @RequestBody Team team) {
+    public ResponseEntity create(Principal principal, @PathVariable("organizationId") UUID organizationId, @RequestBody Team team) {
+        String userId = principal.getName();
+        if(!userService.isAllowed(userId, organizationId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         if(team.id() != null) {
             return ResponseEntity.badRequest().body("id must be null");
         }
@@ -46,7 +61,11 @@ public class TeamController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity update(@PathVariable("organizationId") UUID organizationId, @RequestBody Team team) {
+    public ResponseEntity update(Principal principal, @PathVariable("organizationId") UUID organizationId, @RequestBody Team team) {
+        String userId = principal.getName();
+        if(!userService.isAllowed(userId, organizationId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         if(team.id() == null) {
             return ResponseEntity.badRequest().body("id must not be null");
         }
@@ -55,25 +74,41 @@ public class TeamController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
+    public ResponseEntity delete(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
+        String userId = principal.getName();
+        if(!userService.isAllowed(userId, organizationId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         teamService.delete(organizationId, id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{teamId}/members/")
-    public ResponseEntity listMembers(@PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID id) {
+    public ResponseEntity listMembers(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID id) {
+        String userId = principal.getName();
+        if(!userService.isAllowed(userId, organizationId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         Set<Collaborator> members = collaboratorService.findByTeam(organizationId, id);
         return ResponseEntity.ok(members);
     }
 
     @PutMapping("/{teamId}/members/{memberId}")
-    public ResponseEntity addMember(@PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID teamId, @PathVariable("memberId") UUID memberId) {
+    public ResponseEntity addMember(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID teamId, @PathVariable("memberId") UUID memberId) {
+        String userId = principal.getName();
+        if(!userService.isAllowed(userId, organizationId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         teamService.addMember(organizationId, teamId, memberId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{teamId}/members/{memberId}")
-    public ResponseEntity removeMember(@PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID teamId, @PathVariable("memberId") UUID memberId) {
+    public ResponseEntity removeMember(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID teamId, @PathVariable("memberId") UUID memberId) {
+        String userId = principal.getName();
+        if(!userService.isAllowed(userId, organizationId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         teamService.removeMember(organizationId, teamId, memberId);
         return ResponseEntity.noContent().build();
     }

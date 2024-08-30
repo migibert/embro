@@ -12,6 +12,7 @@ import com.migibert.embro.infrastructure.persistence.model.tables.SeniorityTable
 import com.migibert.embro.infrastructure.persistence.model.tables.SkillTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamCollaboratorTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamTable;
+import com.migibert.embro.infrastructure.persistence.model.tables.UserOrganizationTable;
 
 
 /**
@@ -59,4 +60,9 @@ public class Tables {
      * The table <code>public.team_collaborator</code>.
      */
     public static final TeamCollaboratorTable TEAM_COLLABORATOR = TeamCollaboratorTable.TEAM_COLLABORATOR;
+
+    /**
+     * The table <code>public.user_organization</code>.
+     */
+    public static final UserOrganizationTable USER_ORGANIZATION = UserOrganizationTable.USER_ORGANIZATION;
 }

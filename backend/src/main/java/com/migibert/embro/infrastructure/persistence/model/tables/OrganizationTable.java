@@ -9,6 +9,7 @@ import com.migibert.embro.infrastructure.persistence.model.Public;
 import com.migibert.embro.infrastructure.persistence.model.tables.SeniorityTable.SeniorityPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.SkillTable.SkillPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamTable.TeamPath;
+import com.migibert.embro.infrastructure.persistence.model.tables.UserOrganizationTable.UserOrganizationPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.OrganizationRecord;
 
 import java.util.Collection;
@@ -174,6 +175,19 @@ public class OrganizationTable extends TableImpl<OrganizationRecord> {
             _team = new TeamPath(this, null, Keys.TEAM__FK_TEAM_ORGANIZATION.getInverseKey());
 
         return _team;
+    }
+
+    private transient UserOrganizationPath _userOrganization;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.user_organization</code> table
+     */
+    public UserOrganizationPath userOrganization() {
+        if (_userOrganization == null)
+            _userOrganization = new UserOrganizationPath(this, null, Keys.USER_ORGANIZATION__FK_USER_ORGANIZATION.getInverseKey());
+
+        return _userOrganization;
     }
 
     @Override

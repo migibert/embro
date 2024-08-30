@@ -12,6 +12,7 @@ import com.migibert.embro.infrastructure.persistence.model.tables.SeniorityTable
 import com.migibert.embro.infrastructure.persistence.model.tables.SkillTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamCollaboratorTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamTable;
+import com.migibert.embro.infrastructure.persistence.model.tables.UserOrganizationTable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -75,6 +76,11 @@ public class Public extends SchemaImpl {
     public final TeamCollaboratorTable TEAM_COLLABORATOR = TeamCollaboratorTable.TEAM_COLLABORATOR;
 
     /**
+     * The table <code>public.user_organization</code>.
+     */
+    public final UserOrganizationTable USER_ORGANIZATION = UserOrganizationTable.USER_ORGANIZATION;
+
+    /**
      * No further instances allowed
      */
     private Public() {
@@ -97,7 +103,8 @@ public class Public extends SchemaImpl {
             SeniorityTable.SENIORITY,
             SkillTable.SKILL,
             TeamTable.TEAM,
-            TeamCollaboratorTable.TEAM_COLLABORATOR
+            TeamCollaboratorTable.TEAM_COLLABORATOR,
+            UserOrganizationTable.USER_ORGANIZATION
         );
     }
 }

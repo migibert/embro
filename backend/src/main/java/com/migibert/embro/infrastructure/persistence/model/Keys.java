@@ -12,6 +12,7 @@ import com.migibert.embro.infrastructure.persistence.model.tables.SeniorityTable
 import com.migibert.embro.infrastructure.persistence.model.tables.SkillTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamCollaboratorTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamTable;
+import com.migibert.embro.infrastructure.persistence.model.tables.UserOrganizationTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.CollaboratorRecord;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.CollaboratorSkillRecord;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.FlywaySchemaHistoryRecord;
@@ -20,6 +21,7 @@ import com.migibert.embro.infrastructure.persistence.model.tables.records.Senior
 import com.migibert.embro.infrastructure.persistence.model.tables.records.SkillRecord;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.TeamCollaboratorRecord;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.TeamRecord;
+import com.migibert.embro.infrastructure.persistence.model.tables.records.UserOrganizationRecord;
 
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
@@ -47,6 +49,7 @@ public class Keys {
     public static final UniqueKey<SkillRecord> SKILL_PKEY = Internal.createUniqueKey(SkillTable.SKILL, DSL.name("skill_pkey"), new TableField[] { SkillTable.SKILL.ID }, true);
     public static final UniqueKey<TeamRecord> TEAM_PKEY = Internal.createUniqueKey(TeamTable.TEAM, DSL.name("team_pkey"), new TableField[] { TeamTable.TEAM.ID }, true);
     public static final UniqueKey<TeamCollaboratorRecord> TEAM_COLLABORATOR_PKEY = Internal.createUniqueKey(TeamCollaboratorTable.TEAM_COLLABORATOR, DSL.name("team_collaborator_pkey"), new TableField[] { TeamCollaboratorTable.TEAM_COLLABORATOR.TEAM_ID, TeamCollaboratorTable.TEAM_COLLABORATOR.COLLABORATOR_ID }, true);
+    public static final UniqueKey<UserOrganizationRecord> USER_ORGANIZATION_PKEY = Internal.createUniqueKey(UserOrganizationTable.USER_ORGANIZATION, DSL.name("user_organization_pkey"), new TableField[] { UserOrganizationTable.USER_ORGANIZATION.USER_ID, UserOrganizationTable.USER_ORGANIZATION.ORGANIZATION_ID }, true);
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -59,4 +62,5 @@ public class Keys {
     public static final ForeignKey<TeamRecord, OrganizationRecord> TEAM__FK_TEAM_ORGANIZATION = Internal.createForeignKey(TeamTable.TEAM, DSL.name("fk_team_organization"), new TableField[] { TeamTable.TEAM.ORGANIZATION_ID }, Keys.ORGANIZATION_PKEY, new TableField[] { OrganizationTable.ORGANIZATION.ID }, true);
     public static final ForeignKey<TeamCollaboratorRecord, CollaboratorRecord> TEAM_COLLABORATOR__FK_TEAM_COLLABORATOR_COLLABORATOR = Internal.createForeignKey(TeamCollaboratorTable.TEAM_COLLABORATOR, DSL.name("fk_team_collaborator_collaborator"), new TableField[] { TeamCollaboratorTable.TEAM_COLLABORATOR.COLLABORATOR_ID }, Keys.COLLABORATOR_PKEY, new TableField[] { CollaboratorTable.COLLABORATOR.ID }, true);
     public static final ForeignKey<TeamCollaboratorRecord, TeamRecord> TEAM_COLLABORATOR__FK_TEAM_COLLABORATOR_TEAM = Internal.createForeignKey(TeamCollaboratorTable.TEAM_COLLABORATOR, DSL.name("fk_team_collaborator_team"), new TableField[] { TeamCollaboratorTable.TEAM_COLLABORATOR.TEAM_ID }, Keys.TEAM_PKEY, new TableField[] { TeamTable.TEAM.ID }, true);
+    public static final ForeignKey<UserOrganizationRecord, OrganizationRecord> USER_ORGANIZATION__FK_USER_ORGANIZATION = Internal.createForeignKey(UserOrganizationTable.USER_ORGANIZATION, DSL.name("fk_user_organization"), new TableField[] { UserOrganizationTable.USER_ORGANIZATION.ORGANIZATION_ID }, Keys.ORGANIZATION_PKEY, new TableField[] { OrganizationTable.ORGANIZATION.ID }, true);
 }

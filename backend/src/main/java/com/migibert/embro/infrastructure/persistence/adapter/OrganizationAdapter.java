@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -58,6 +59,12 @@ public class OrganizationAdapter implements OrganizationPort {
     public List<Organization> findAll() {
         return this.context.selectFrom(ORGANIZATION).stream().map(this::toDomainModel).collect(Collectors.toList());
     }
+
+    @Override
+    public Set<Organization> findByIds(List<UUID> ids) {
+        return this.context.selectFrom(ORGANIZATION).where(ORGANIZATION.ID.in(ids)).stream().map(this::toDomainModel).collect(Collectors.toSet());
+    }
+
 
     private Organization toDomainModel(OrganizationRecord record) {
         return new Organization(record.getId(), record.getName());
