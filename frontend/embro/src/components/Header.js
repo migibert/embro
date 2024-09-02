@@ -1,11 +1,10 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import MenuIcon from '@mui/icons-material/Menu';
-import { AppBar, Avatar, Tooltip } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
+import { AppBar, Avatar, Stack, Tooltip } from '@mui/material';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import { useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { OrganizationContext } from '../context/OrganizationContext';
 
 function Header() {
@@ -15,25 +14,24 @@ function Header() {
   return (
     <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
       <Toolbar>
-        <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
-        <MenuIcon />
-        </IconButton>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
         EM Bro
         </Typography>
-        {organizations?.map((organization) =>
-        <Tooltip title={organization.name} key={organization.id}>
-          <Avatar 
-            onClick={() => setCurrentOrganization(organization)}
-            sx={(currentOrganization === organization ? { border: '2px solid black'} : null)}
-            style={{cursor: 'pointer'}}
-            alt={organization.name}
-          >
-            {organization.name.charAt(0)}
-          </Avatar>
-        </Tooltip>
-        )}
-        {isAuthenticated && <Avatar src={user.picture} />}
+        <Stack spacing={2} direction='row'>
+          {organizations?.map((organization) =>
+          <Tooltip title={organization.name} key={organization.id}>
+            <Avatar
+              onClick={() => setCurrentOrganization(organization)}
+              sx={(currentOrganization === organization ? { border: '2px solid black'} : null)}
+              style={{cursor: 'pointer'}}
+              alt={organization.name}
+            >
+              {organization.name.charAt(0)}
+            </Avatar>
+          </Tooltip>
+          )}
+          {isAuthenticated && <Link to="/profile"><Avatar src={user.picture} /></Link>} 
+        </Stack>
       </Toolbar>
     </AppBar>
   );

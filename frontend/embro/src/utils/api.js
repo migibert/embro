@@ -62,7 +62,31 @@ const createTeam = async (token, organizationId, name) => {
     );
 };
 
+const listSkills = async (token, organizationId) => {
+    return get(token, `http://localhost:8080/organizations/${organizationId}/skills/`);
+};
+
+const createSkill = async (token, organizationId, name) => {
+    return post(
+        token,
+        `http://localhost:8080/organizations/${organizationId}/skills/`, 
+        JSON.stringify({id: null, name: name})
+    );
+};
+
+const listSeniorities = async (token, organizationId) => {
+    return get(token, `http://localhost:8080/organizations/${organizationId}/seniorities/`);
+};
+
+const createSeniority = async (token, organizationId, name) => {
+    return post(
+        token,
+        `http://localhost:8080/organizations/${organizationId}/seniorities/`, 
+        JSON.stringify({id: null, name: name})
+    );
+};
+
 export {
-    createOrganization, createTeam, listOrganizations, listTeams
+    createOrganization, createSeniority, createSkill, createTeam, listOrganizations, listSeniorities, listSkills, listTeams
 };
 

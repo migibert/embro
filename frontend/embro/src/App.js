@@ -2,10 +2,10 @@ import { useAuth0 } from "@auth0/auth0-react";
 import React, { useEffect, useState } from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Layout from "./components/Layout";
-import PrivateRoute from './components/PrivateRoute';
 import { OrganizationContext } from "./context/OrganizationContext";
-import routes from "./Routes";
 import { listOrganizations } from "./utils/api";
+import PrivateRoute from './utils/PrivateRoute';
+import routes from "./utils/Routes";
 
 function App() {
   const { isLoading, isAuthenticated, loginWithRedirect, getAccessTokenSilently } = useAuth0();
@@ -18,6 +18,9 @@ function App() {
         const token = await getAccessTokenSilently();
         const userOrganizations = await listOrganizations(token);
         setOrganizations(userOrganizations);
+        if(userOrganizations && userOrganizations.length > 0) {
+          setCurrentOrganization(userOrganizations[0]);
+        }
       }
     }
     init();

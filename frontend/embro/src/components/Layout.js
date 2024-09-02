@@ -1,7 +1,7 @@
 import { Box, CssBaseline, Drawer, ListItem, ListItemText, Toolbar } from '@mui/material';
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import routes from '../Routes';
+import routes from '../utils/Routes';
 import Footer from './Footer';
 import Header from './Header';
 

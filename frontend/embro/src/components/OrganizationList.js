@@ -22,7 +22,7 @@ const OrganizationList = () => {
 
   return (
     <div>
-      <Typography variant="h1">Organizations</Typography>
+      <Typography variant="h2">Organizations</Typography>
       <IconButton onClick={() => setAdding(true)}>
         <AddCircleIcon/>
       </IconButton>
