@@ -4,7 +4,7 @@ import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import { IconButton, List, ListItem, ListItemText, TextField, Typography } from '@mui/material';
 import { React, useContext, useState } from 'react';
 import { OrganizationContext } from '../context/OrganizationContext';
-import { post } from '../utils/api';
+import { createOrganization } from '../utils/api';
 
 const OrganizationList = () => {
   const { organizations, setOrganizations } = useContext(OrganizationContext);
@@ -15,8 +15,7 @@ const OrganizationList = () => {
   const addOrganization = async () => {
     const token = await getAccessTokenSilently();
     const body = JSON.stringify({id: null, name: newName});
-    const created = await post(token, 'http://localhost:8080/organizations/', body);
-    organizations.push(created);
+    const created = await createOrganization(token, body);
     setOrganizations([...organizations, created]);
     setAdding(false);
   }

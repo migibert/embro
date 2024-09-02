@@ -40,6 +40,29 @@ const post = async (token, url, body) => {
 
 const listOrganizations = async (token) => {
     return get(token, 'http://localhost:8080/organizations/');
-}
-export { get, listOrganizations, post };
+};
+
+const createOrganization = async (token, name) => {
+    return post(
+        token, 
+        'http://localhost:8080/organizations/', 
+        JSON.stringify({id: null, name: name})
+    );
+};
+
+const listTeams = async (token, organizationId) => {
+    return get(token, `http://localhost:8080/organizations/${organizationId}/teams/`);
+};
+
+const createTeam = async (token, organizationId, name) => {
+    return post(
+        token,
+        `http://localhost:8080/organizations/${organizationId}/teams/`, 
+        JSON.stringify({id: null, name: name})
+    );
+};
+
+export {
+    createOrganization, createTeam, listOrganizations, listTeams
+};
 
