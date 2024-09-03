@@ -6,7 +6,7 @@ import { React, useContext, useEffect, useState } from 'react';
 import { OrganizationContext } from '../context/OrganizationContext';
 import { createTeam, listTeams } from '../utils/api';
 
-const TeamList = () => {
+const Teams = () => {
   const { getAccessTokenSilently } = useAuth0();
   const { currentOrganization} = useContext(OrganizationContext);
   const [teams, setTeams] = useState([]);
@@ -57,5 +57,5 @@ const TeamList = () => {
   );
 };
 
-export default TeamList;
+export default Teams;
 

@@ -1,4 +1,4 @@
-const get = async (token, url) => {
+const _get = async (token, url) => {
     try {
         const response = await fetch(
             url,
@@ -11,13 +11,17 @@ const get = async (token, url) => {
             }
         );
         const responseData = await response.json(); 
+        if(responseData.error) {
+            throw new Error(responseData.error);
+        }
         return responseData;
     } catch (error) {
-        console.log(error.message);
+        console.error(error.message);
+        throw error;
     }
 };
 
-const post = async (token, url, body) => {
+const _post = async (token, url, body) => {
     try {
         const response = await fetch(
             url,
@@ -30,20 +34,46 @@ const post = async (token, url, body) => {
                 method: "POST",
             }
         );
-        const responseData = await response.json(); 
-        console.log("response", responseData)
+        const responseData = await response.json();
+        if(responseData.error) {
+            throw new Error(responseData.error);
+        }
         return responseData;
     } catch (error) {
-        console.log(error.message);
+        console.error(error.message);
+        throw error;
     }
 };
 
+const _delete = async (token, url) => {
+    try {
+        const response = await fetch(
+            url,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                method: "DELETE",
+            }
+        );
+        const responseData = await response.json();
+        if(responseData.error) {
+            throw new Error(responseData.error);
+        }
+        return responseData;
+    } catch (error) {
+        console.error(error.message);
+        throw error;
+    }
+};
+
+
 const listOrganizations = async (token) => {
-    return get(token, 'http://localhost:8080/organizations/');
+    return _get(token, 'http://localhost:8080/organizations/');
 };
 
 const createOrganization = async (token, name) => {
-    return post(
+    return _post(
         token, 
         'http://localhost:8080/organizations/', 
         JSON.stringify({id: null, name: name})
@@ -51,11 +81,11 @@ const createOrganization = async (token, name) => {
 };
 
 const listTeams = async (token, organizationId) => {
-    return get(token, `http://localhost:8080/organizations/${organizationId}/teams/`);
+    return _get(token, `http://localhost:8080/organizations/${organizationId}/teams/`);
 };
 
 const createTeam = async (token, organizationId, name) => {
-    return post(
+    return _post(
         token,
         `http://localhost:8080/organizations/${organizationId}/teams/`, 
         JSON.stringify({id: null, name: name})
@@ -63,11 +93,11 @@ const createTeam = async (token, organizationId, name) => {
 };
 
 const listSkills = async (token, organizationId) => {
-    return get(token, `http://localhost:8080/organizations/${organizationId}/skills/`);
+    return _get(token, `http://localhost:8080/organizations/${organizationId}/skills/`);
 };
 
 const createSkill = async (token, organizationId, name) => {
-    return post(
+    return _post(
         token,
         `http://localhost:8080/organizations/${organizationId}/skills/`, 
         JSON.stringify({id: null, name: name})
@@ -75,18 +105,34 @@ const createSkill = async (token, organizationId, name) => {
 };
 
 const listSeniorities = async (token, organizationId) => {
-    return get(token, `http://localhost:8080/organizations/${organizationId}/seniorities/`);
+    return _get(token, `http://localhost:8080/organizations/${organizationId}/seniorities/`);
 };
 
 const createSeniority = async (token, organizationId, name) => {
-    return post(
+    return _post(
         token,
         `http://localhost:8080/organizations/${organizationId}/seniorities/`, 
         JSON.stringify({id: null, name: name})
     );
 };
 
+const listCollaborators = async (token, organizationId) => {
+    return _get(token, `http://localhost:8080/organizations/${organizationId}/collaborators/`);
+};
+
+const deleteCollaborator = async (token, organizationId, collaboratorId) => {
+    return _delete(token, `http://localhost:8080/organizations/${organizationId}/collaborators/${collaboratorId}`);
+}
+
+const createCollaborator = async (token, organizationId, collaborator) => {
+    return _post(
+        token,
+        `http://localhost:8080/organizations/${organizationId}/collaborators/`,
+        JSON.stringify(collaborator)
+    );
+};
+
 export {
-    createOrganization, createSeniority, createSkill, createTeam, listOrganizations, listSeniorities, listSkills, listTeams
+    createCollaborator, createOrganization, createSeniority, createSkill, createTeam, deleteCollaborator, listCollaborators, listOrganizations, listSeniorities, listSkills, listTeams
 };
 
