@@ -7,6 +7,7 @@ package com.migibert.embro.infrastructure.persistence.model.tables;
 import com.migibert.embro.infrastructure.persistence.model.Keys;
 import com.migibert.embro.infrastructure.persistence.model.Public;
 import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorTable.CollaboratorPath;
+import com.migibert.embro.infrastructure.persistence.model.tables.OrganizationTable.OrganizationPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.SkillTable.SkillPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.CollaboratorSkillRecord;
 
@@ -57,6 +58,11 @@ public class CollaboratorSkillTable extends TableImpl<CollaboratorSkillRecord> {
     public Class<CollaboratorSkillRecord> getRecordType() {
         return CollaboratorSkillRecord.class;
     }
+
+    /**
+     * The column <code>public.collaborator_skill.organization_id</code>.
+     */
+    public final TableField<CollaboratorSkillRecord, UUID> ORGANIZATION_ID = createField(DSL.name("organization_id"), SQLDataType.UUID.nullable(false), this, "");
 
     /**
      * The column <code>public.collaborator_skill.collaborator_id</code>.
@@ -147,7 +153,19 @@ public class CollaboratorSkillTable extends TableImpl<CollaboratorSkillRecord> {
 
     @Override
     public List<ForeignKey<CollaboratorSkillRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.COLLABORATOR_SKILL__FK_COLLABORATOR_SKILL_COLLABORATOR, Keys.COLLABORATOR_SKILL__FK_COLLABORATOR_SKILL_SKILL);
+        return Arrays.asList(Keys.COLLABORATOR_SKILL__FK_COLLABORATOR_SKILL_ORGANIZATION, Keys.COLLABORATOR_SKILL__FK_COLLABORATOR_SKILL_COLLABORATOR, Keys.COLLABORATOR_SKILL__FK_COLLABORATOR_SKILL_SKILL);
+    }
+
+    private transient OrganizationPath _organization;
+
+    /**
+     * Get the implicit join path to the <code>public.organization</code> table.
+     */
+    public OrganizationPath organization() {
+        if (_organization == null)
+            _organization = new OrganizationPath(this, Keys.COLLABORATOR_SKILL__FK_COLLABORATOR_SKILL_ORGANIZATION, null);
+
+        return _organization;
     }
 
     private transient CollaboratorPath _collaborator;

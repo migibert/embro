@@ -22,11 +22,11 @@ function Header() {
           <Tooltip title={organization.name} key={organization.id}>
             <Avatar
               onClick={() => setCurrentOrganization(organization)}
-              sx={(currentOrganization === organization ? { border: '2px solid black'} : null)}
+              sx={(currentOrganization === organization ? { border: '2px solid black', bgcolor: 'mediumpurple'} : null)}
               style={{cursor: 'pointer'}}
               alt={organization.name}
             >
-              {organization.name.charAt(0)}
+              {organization.name.split(' ').map(i => i.charAt(0)).join('')}
             </Avatar>
           </Tooltip>
           )}

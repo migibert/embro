@@ -45,6 +45,30 @@ const _post = async (token, url, body) => {
     }
 };
 
+const _put = async (token, url, body) => {
+    try {
+        const response = await fetch(
+            url,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: body,
+                method: "PUT",
+            }
+        );
+        const responseData = await response.json();
+        if(responseData.error) {
+            throw new Error(responseData.error);
+        }
+        return responseData;
+    } catch (error) {
+        console.error(error.message);
+        throw error;
+    }
+};
+
 const _delete = async (token, url) => {
     try {
         const response = await fetch(
@@ -56,11 +80,9 @@ const _delete = async (token, url) => {
                 method: "DELETE",
             }
         );
-        const responseData = await response.json();
-        if(responseData.error) {
-            throw new Error(responseData.error);
+        if(response.status !== 204) {
+            throw new Error(`${response.status}-${response.statusText}`);
         }
-        return responseData;
     } catch (error) {
         console.error(error.message);
         throw error;
@@ -79,6 +101,10 @@ const createOrganization = async (token, name) => {
         JSON.stringify({id: null, name: name})
     );
 };
+
+const deleteOrganization = async (token, id) => {
+    return _delete(token, `http://localhost:8080/organizations/${id}`);
+}
 
 const listTeams = async (token, organizationId) => {
     return _get(token, `http://localhost:8080/organizations/${organizationId}/teams/`);
@@ -104,6 +130,10 @@ const createSkill = async (token, organizationId, name) => {
     );
 };
 
+const deleteSkill = async (token, organizationId, skillId) => {
+    return _delete(token, `http://localhost:8080/organizations/${organizationId}/skills/${skillId}`);
+};
+
 const listSeniorities = async (token, organizationId) => {
     return _get(token, `http://localhost:8080/organizations/${organizationId}/seniorities/`);
 };
@@ -116,9 +146,17 @@ const createSeniority = async (token, organizationId, name) => {
     );
 };
 
+const deleteSeniority = async (token, organizationId, seniorityId) => {
+    return _delete(token, `http://localhost:8080/organizations/${organizationId}/seniorities/${seniorityId}`);
+};
+
 const listCollaborators = async (token, organizationId) => {
     return _get(token, `http://localhost:8080/organizations/${organizationId}/collaborators/`);
 };
+
+const updateCollaborator = async (token, organizationId, collaborator) => {
+    return _put(token, `http://localhost:8080/organizations/${organizationId}/collaborators/${collaborator.id}`, JSON.stringify(collaborator));
+}
 
 const deleteCollaborator = async (token, organizationId, collaboratorId) => {
     return _delete(token, `http://localhost:8080/organizations/${organizationId}/collaborators/${collaboratorId}`);
@@ -132,7 +170,21 @@ const createCollaborator = async (token, organizationId, collaborator) => {
     );
 };
 
-export {
-    createCollaborator, createOrganization, createSeniority, createSkill, createTeam, deleteCollaborator, listCollaborators, listOrganizations, listSeniorities, listSkills, listTeams
+const listRoles = async (token, organizationId) => {
+    return _get(token, `http://localhost:8080/organizations/${organizationId}/roles/`);
 };
+
+const createRole = async (token, organizationId, name) => {
+    return _post(
+        token, 
+        `http://localhost:8080/organizations/${organizationId}/roles/`,
+        JSON.stringify({id: null, name: name}));
+};
+
+const deleteRole = async (token, organizationId, roleId) => {
+    return _delete(token, `http://localhost:8080/organizations/${organizationId}/roles/${roleId}`);
+}
+
+
+    export { createCollaborator, createOrganization, createRole, createSeniority, createSkill, createTeam, deleteCollaborator, deleteOrganization, deleteRole, deleteSeniority, deleteSkill, listCollaborators, listOrganizations, listRoles, listSeniorities, listSkills, listTeams, updateCollaborator };
 

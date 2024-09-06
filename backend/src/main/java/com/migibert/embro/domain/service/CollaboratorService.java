@@ -48,6 +48,10 @@ public class CollaboratorService {
         return this.port.findByTeam(organizationId, teamId);
     }
 
+    public Set<Collaborator> findByRole(UUID organizationId, String roleName) {
+        return this.port.findByRole(organizationId, roleName);
+    }
+
     public Set<Collaborator> findAll(UUID organizationId) {
         return this.port.findAll(organizationId);
     }

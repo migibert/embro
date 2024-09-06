@@ -6,8 +6,12 @@ package com.migibert.embro.infrastructure.persistence.model.tables;
 
 import com.migibert.embro.infrastructure.persistence.model.Keys;
 import com.migibert.embro.infrastructure.persistence.model.Public;
+import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorSkillTable.CollaboratorSkillPath;
+import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorTable.CollaboratorPath;
+import com.migibert.embro.infrastructure.persistence.model.tables.RoleTable.RolePath;
 import com.migibert.embro.infrastructure.persistence.model.tables.SeniorityTable.SeniorityPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.SkillTable.SkillPath;
+import com.migibert.embro.infrastructure.persistence.model.tables.TeamCollaboratorTable.TeamCollaboratorPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamTable.TeamPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.UserOrganizationTable.UserOrganizationPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.OrganizationRecord;
@@ -140,6 +144,44 @@ public class OrganizationTable extends TableImpl<OrganizationRecord> {
         return Keys.ORGANIZATION_PKEY;
     }
 
+    private transient CollaboratorPath _collaborator;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.collaborator</code> table
+     */
+    public CollaboratorPath collaborator() {
+        if (_collaborator == null)
+            _collaborator = new CollaboratorPath(this, null, Keys.COLLABORATOR__FK_COLLABORATOR_ORGANIZATION.getInverseKey());
+
+        return _collaborator;
+    }
+
+    private transient CollaboratorSkillPath _collaboratorSkill;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.collaborator_skill</code> table
+     */
+    public CollaboratorSkillPath collaboratorSkill() {
+        if (_collaboratorSkill == null)
+            _collaboratorSkill = new CollaboratorSkillPath(this, null, Keys.COLLABORATOR_SKILL__FK_COLLABORATOR_SKILL_ORGANIZATION.getInverseKey());
+
+        return _collaboratorSkill;
+    }
+
+    private transient RolePath _role;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.role</code> table
+     */
+    public RolePath role() {
+        if (_role == null)
+            _role = new RolePath(this, null, Keys.ROLE__FK_ROLE_ORGANIZATION.getInverseKey());
+
+        return _role;
+    }
+
     private transient SeniorityPath _seniority;
 
     /**
@@ -175,6 +217,19 @@ public class OrganizationTable extends TableImpl<OrganizationRecord> {
             _team = new TeamPath(this, null, Keys.TEAM__FK_TEAM_ORGANIZATION.getInverseKey());
 
         return _team;
+    }
+
+    private transient TeamCollaboratorPath _teamCollaborator;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.team_collaborator</code> table
+     */
+    public TeamCollaboratorPath teamCollaborator() {
+        if (_teamCollaborator == null)
+            _teamCollaborator = new TeamCollaboratorPath(this, null, Keys.TEAM_COLLABORATOR__FK_TEAM_COLLABORATOR_ORGANIZATION.getInverseKey());
+
+        return _teamCollaborator;
     }
 
     private transient UserOrganizationPath _userOrganization;

@@ -21,45 +21,59 @@ public class CollaboratorSkillRecord extends UpdatableRecordImpl<CollaboratorSki
     private static final long serialVersionUID = 1L;
 
     /**
+     * Setter for <code>public.collaborator_skill.organization_id</code>.
+     */
+    public void setOrganizationId(UUID value) {
+        set(0, value);
+    }
+
+    /**
+     * Getter for <code>public.collaborator_skill.organization_id</code>.
+     */
+    public UUID getOrganizationId() {
+        return (UUID) get(0);
+    }
+
+    /**
      * Setter for <code>public.collaborator_skill.collaborator_id</code>.
      */
     public void setCollaboratorId(UUID value) {
-        set(0, value);
+        set(1, value);
     }
 
     /**
      * Getter for <code>public.collaborator_skill.collaborator_id</code>.
      */
     public UUID getCollaboratorId() {
-        return (UUID) get(0);
+        return (UUID) get(1);
     }
 
     /**
      * Setter for <code>public.collaborator_skill.skill_id</code>.
      */
     public void setSkillId(UUID value) {
-        set(1, value);
+        set(2, value);
     }
 
     /**
      * Getter for <code>public.collaborator_skill.skill_id</code>.
      */
     public UUID getSkillId() {
-        return (UUID) get(1);
+        return (UUID) get(2);
     }
 
     /**
      * Setter for <code>public.collaborator_skill.proficiency</code>.
      */
     public void setProficiency(Integer value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.collaborator_skill.proficiency</code>.
      */
     public Integer getProficiency() {
-        return (Integer) get(2);
+        return (Integer) get(3);
     }
 
     // -------------------------------------------------------------------------
@@ -85,9 +99,10 @@ public class CollaboratorSkillRecord extends UpdatableRecordImpl<CollaboratorSki
     /**
      * Create a detached, initialised CollaboratorSkillRecord
      */
-    public CollaboratorSkillRecord(UUID collaboratorId, UUID skillId, Integer proficiency) {
+    public CollaboratorSkillRecord(UUID organizationId, UUID collaboratorId, UUID skillId, Integer proficiency) {
         super(CollaboratorSkillTable.COLLABORATOR_SKILL);
 
+        setOrganizationId(organizationId);
         setCollaboratorId(collaboratorId);
         setSkillId(skillId);
         setProficiency(proficiency);

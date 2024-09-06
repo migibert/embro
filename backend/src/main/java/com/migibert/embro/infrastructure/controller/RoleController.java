@@ -1,7 +1,7 @@
 package com.migibert.embro.infrastructure.controller;
 
-import com.migibert.embro.domain.model.Collaborator;
-import com.migibert.embro.domain.service.CollaboratorService;
+import com.migibert.embro.domain.model.Role;
+import com.migibert.embro.domain.service.RoleService;
 import com.migibert.embro.domain.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,66 +13,53 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/organizations/{organizationId}/collaborators")
+@RequestMapping("/organizations/{organizationId}/roles")
 @AllArgsConstructor
-public class CollaboratorController {
+public class RoleController {
 
-    private final CollaboratorService service;
+    private final RoleService service;
     private final UserService userService;
 
-    @GetMapping("/")
+    @RequestMapping("/")
     public ResponseEntity list(Principal principal, @PathVariable("organizationId") UUID organizationId) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if (!userService.isAllowed(userId, organizationId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        Iterable<Collaborator> collaborators = service.findAll(organizationId);
-        return ResponseEntity.ok(collaborators);
+        Iterable<Role> roles = service.findAll(organizationId);
+        return ResponseEntity.ok(roles);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity get(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if (!userService.isAllowed(userId, organizationId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        Optional<Collaborator> collaborator = service.findById(organizationId, id);
-        if(collaborator.isEmpty()) {
+        Optional<Role> role = service.findById(organizationId, id);
+        if (role.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(collaborator.get());
+        return ResponseEntity.ok(role.get());
     }
 
     @PostMapping("/")
-    public ResponseEntity create(Principal principal, @PathVariable("organizationId") UUID organizationId, @RequestBody Collaborator collaborator) {
+    public ResponseEntity create(Principal principal, @PathVariable("organizationId") UUID organizationId, @RequestBody Role role) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if (!userService.isAllowed(userId, organizationId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        if(collaborator.id() != null) {
+        if (role.id() != null) {
             return ResponseEntity.badRequest().body("id must be null");
         }
-        Collaborator saved = service.create(organizationId, collaborator);
+        Role saved = service.create(organizationId, role);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity update(Principal principal, @PathVariable("organizationId") UUID organizationId, @RequestBody Collaborator collaborator) {
-        String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        if(collaborator.id() == null) {
-            return ResponseEntity.badRequest().body("id must not be null");
-        }
-        Collaborator updated = service.update(organizationId, collaborator);
-        return ResponseEntity.ok().body(updated);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity delete(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if (!userService.isAllowed(userId, organizationId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         service.delete(organizationId, id);

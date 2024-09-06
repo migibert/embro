@@ -8,6 +8,7 @@ import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorSk
 import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.FlywaySchemaHistoryTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.OrganizationTable;
+import com.migibert.embro.infrastructure.persistence.model.tables.RoleTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.SeniorityTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.SkillTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamCollaboratorTable;
@@ -40,6 +41,11 @@ public class Tables {
      * The table <code>public.organization</code>.
      */
     public static final OrganizationTable ORGANIZATION = OrganizationTable.ORGANIZATION;
+
+    /**
+     * The table <code>public.role</code>.
+     */
+    public static final RoleTable ROLE = RoleTable.ROLE;
 
     /**
      * The table <code>public.seniority</code>.

@@ -6,6 +6,7 @@ import com.migibert.embro.infrastructure.persistence.model.tables.records.Organi
 import org.jooq.DSLContext;
 import org.jooq.impl.QOM;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.migibert.embro.infrastructure.persistence.model.Tables.ORGANIZATION;
+import static com.migibert.embro.infrastructure.persistence.model.Tables.*;
 import static org.jooq.impl.DSL.count;
 import static org.jooq.impl.DSL.or;
 
@@ -36,8 +37,18 @@ public class OrganizationAdapter implements OrganizationPort {
         return toDomainModel(record);
     }
 
+    @Transactional
     public void deleteById(UUID organizationId) {
-        this.context.deleteFrom(ORGANIZATION).where(ORGANIZATION.ID.eq(organizationId));
+        //TODO
+        this.context.deleteFrom(TEAM_COLLABORATOR).where(TEAM_COLLABORATOR.ORGANIZATION_ID.eq(organizationId)).execute();
+        this.context.deleteFrom(TEAM).where(TEAM.ORGANIZATION_ID.eq(organizationId)).execute();
+        this.context.deleteFrom(COLLABORATOR_SKILL).where(COLLABORATOR_SKILL.ORGANIZATION_ID.eq(organizationId)).execute();
+        this.context.deleteFrom(COLLABORATOR).where(COLLABORATOR.ORGANIZATION_ID.eq(organizationId)).execute();
+        this.context.deleteFrom(SKILL).where(SKILL.ORGANIZATION_ID.eq(organizationId)).execute();
+        this.context.deleteFrom(SENIORITY).where(SENIORITY.ORGANIZATION_ID.eq(organizationId)).execute();
+        this.context.deleteFrom(ROLE).where(ROLE.ORGANIZATION_ID.eq(organizationId)).execute();
+        this.context.deleteFrom(USER_ORGANIZATION).where(USER_ORGANIZATION.ORGANIZATION_ID.eq(organizationId)).execute();
+        this.context.deleteFrom(ORGANIZATION).where(ORGANIZATION.ID.eq(organizationId)).execute();
     }
 
     public Optional<Organization> findById(UUID organizationId) {

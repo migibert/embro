@@ -73,8 +73,8 @@ public class TeamAdapter implements TeamPort {
     @Override
     public void addMember(UUID organizationId, UUID teamId, UUID memberId) {
         this.context.insertInto(TEAM_COLLABORATOR)
-                .columns(TEAM_COLLABORATOR.COLLABORATOR_ID, TEAM_COLLABORATOR.TEAM_ID)
-                .values(memberId, teamId)
+                .columns(TEAM_COLLABORATOR.ORGANIZATION_ID, TEAM_COLLABORATOR.COLLABORATOR_ID, TEAM_COLLABORATOR.TEAM_ID)
+                .values(organizationId, memberId, teamId)
                 .execute();
     }
 
@@ -83,6 +83,7 @@ public class TeamAdapter implements TeamPort {
         this.context.deleteFrom(TEAM_COLLABORATOR)
                 .where(TEAM_COLLABORATOR.TEAM_ID.eq(teamId))
                 .and(TEAM_COLLABORATOR.COLLABORATOR_ID.eq(memberId))
+                .and(TEAM_COLLABORATOR.ORGANIZATION_ID.eq(organizationId))
                 .execute();
     }
 

@@ -20,6 +20,14 @@ CREATE TABLE SKILL(
     CONSTRAINT fk_skill_organization FOREIGN KEY (organization_id) REFERENCES organization(id)
 );
 
+CREATE TABLE ROLE(
+    id UUID,
+    organization_id UUID NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_role_organization FOREIGN KEY (organization_id) REFERENCES organization(id)
+);
+
 CREATE TABLE COLLABORATOR(
     id UUID,
     organization_id UUID NOT NULL,
@@ -30,14 +38,17 @@ CREATE TABLE COLLABORATOR(
     birth_date DATE,
     start_date DATE,
     seniority_name VARCHAR(100),
+    CONSTRAINT fk_collaborator_organization FOREIGN KEY (organization_id) REFERENCES organization(id),
     PRIMARY KEY (id)
 );
 
 CREATE TABLE COLLABORATOR_SKILL(
+    organization_id UUID NOT NULL,
     collaborator_id UUID NOT NULL,
     skill_id UUID NOT NULL,
     proficiency INTEGER NOT NULL,
     PRIMARY KEY (collaborator_id, skill_id),
+    CONSTRAINT fk_collaborator_skill_organization FOREIGN KEY (organization_id) REFERENCES organization(id),
     CONSTRAINT fk_collaborator_skill_collaborator FOREIGN KEY (collaborator_id) REFERENCES collaborator(id),
     CONSTRAINT fk_collaborator_skill_skill FOREIGN KEY (skill_id) REFERENCES skill(id)
 );
@@ -51,9 +62,11 @@ CREATE TABLE TEAM(
 );
 
 CREATE TABLE TEAM_COLLABORATOR(
+    organization_id UUID NOT NULL,
     team_id UUID NOT NULL,
     collaborator_id UUID NOT NULL,
     PRIMARY KEY (team_id, collaborator_id),
+    CONSTRAINT fk_team_collaborator_organization FOREIGN KEY (organization_id) REFERENCES organization(id),
     CONSTRAINT fk_team_collaborator_collaborator FOREIGN KEY (collaborator_id) REFERENCES collaborator(id),
     CONSTRAINT fk_team_collaborator_team FOREIGN KEY (team_id) REFERENCES team(id)
 );

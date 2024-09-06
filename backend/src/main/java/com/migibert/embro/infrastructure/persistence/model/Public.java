@@ -8,6 +8,7 @@ import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorSk
 import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.FlywaySchemaHistoryTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.OrganizationTable;
+import com.migibert.embro.infrastructure.persistence.model.tables.RoleTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.SeniorityTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.SkillTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamCollaboratorTable;
@@ -56,6 +57,11 @@ public class Public extends SchemaImpl {
     public final OrganizationTable ORGANIZATION = OrganizationTable.ORGANIZATION;
 
     /**
+     * The table <code>public.role</code>.
+     */
+    public final RoleTable ROLE = RoleTable.ROLE;
+
+    /**
      * The table <code>public.seniority</code>.
      */
     public final SeniorityTable SENIORITY = SeniorityTable.SENIORITY;
@@ -100,6 +106,7 @@ public class Public extends SchemaImpl {
             CollaboratorSkillTable.COLLABORATOR_SKILL,
             FlywaySchemaHistoryTable.FLYWAY_SCHEMA_HISTORY,
             OrganizationTable.ORGANIZATION,
+            RoleTable.ROLE,
             SeniorityTable.SENIORITY,
             SkillTable.SKILL,
             TeamTable.TEAM,

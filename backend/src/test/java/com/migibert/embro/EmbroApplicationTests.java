@@ -48,6 +48,7 @@ class EmbroApplicationTests {
 	private Skill java;
 	private Skill decisionMaking;
 	private Skill projectManagement;
+	private Role softwareEngineer;
 	private Seniority junior;
 	private Seniority medium;
 	private Seniority senior;
@@ -66,6 +67,8 @@ class EmbroApplicationTests {
 		medium = createSeniority(organization, "Medium");
 		senior = createSeniority(organization, "Senior");
 
+		softwareEngineer = createRole(organization, "Software Engineer");
+
 		team = createTeam(organization, "B2C");
 		mikael = create(
 			"/organizations/" + organization.id() + "/collaborators/",
@@ -74,7 +77,7 @@ class EmbroApplicationTests {
 				"mgibert@gmail.com",
 				"Mikael",
 				"Gibert",
-				"Engineering Manager",
+				softwareEngineer.name(),
 				LocalDate.of(1987, 2, 6),
 				LocalDate.of(2023, 2, 8),
 				senior.name(),
@@ -103,6 +106,10 @@ class EmbroApplicationTests {
 		return create("/organizations/" + organization.id() + "/seniorities/", seniority, Seniority.class);
 	}
 
+	private Role createRole(Organization organization, String name) throws Exception {
+		Role role = new Role(null, name);
+		return create("/organizations/" + organization.id() + "/roles/", role, Role.class);
+	}
 	private Team createTeam(Organization organization, String name) throws Exception {
 		Team team = new Team(null, name);
 		return create("/organizations/" + organization.id() + "/teams/", team, Team.class);
@@ -130,6 +137,7 @@ class EmbroApplicationTests {
 		expectBodyToBe("/organizations/" + organization.id() + "/seniorities/" + junior.id(), junior, Seniority.class);
 		expectBodyToBe("/organizations/" + organization.id() + "/seniorities/" + medium.id(), medium, Seniority.class);
 		expectBodyToBe("/organizations/" + organization.id() + "/seniorities/" + senior.id(), senior, Seniority.class);
+		expectBodyToBe("/organizations/" + organization.id() + "/roles/" + softwareEngineer.id(), softwareEngineer, Role.class);
 		expectBodyToBe("/organizations/" + organization.id() + "/teams/" + team.id(), team, Team.class);
 		expectBodyToBe("/organizations/" + organization.id() + "/collaborators/" + mikael.id(), mikael, Collaborator.class);
 	}

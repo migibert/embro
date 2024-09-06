@@ -7,6 +7,7 @@ import com.migibert.embro.domain.port.CollaboratorPort;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.CollaboratorRecord;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.CollaboratorSkillRecord;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.SkillRecord;
+import lombok.extern.java.Log;
 import org.jooq.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,7 @@ public class CollaboratorAdapter implements CollaboratorPort {
 
         List<CollaboratorSkillRecord> records = collaborator.skills()
             .stream()
-            .map(skillLevel -> new CollaboratorSkillRecord(collaborator.id(), skillLevel.skill().id(), skillLevel.proficiency()))
+            .map(skillLevel -> new CollaboratorSkillRecord(organizationId, collaborator.id(), skillLevel.skill().id(), skillLevel.proficiency()))
             .collect(Collectors.toList());
 
         this.context.batchInsert(records).execute();
@@ -50,16 +51,37 @@ public class CollaboratorAdapter implements CollaboratorPort {
     }
 
     @Override
+    @Transactional
     public Collaborator update(UUID organizationId, Collaborator collaborator) {
-        return null;
+        this.context.update(COLLABORATOR)
+                    .set(COLLABORATOR.ORGANIZATION_ID, organizationId)
+                    .set(COLLABORATOR.FIRSTNAME, collaborator.firstname())
+                    .set(COLLABORATOR.LASTNAME, collaborator.lastname())
+                    .set(COLLABORATOR.BIRTH_DATE, collaborator.birthDate())
+                    .set(COLLABORATOR.EMAIL, collaborator.email())
+                    .set(COLLABORATOR.ROLE, collaborator.role())
+                    .set(COLLABORATOR.SENIORITY_NAME, collaborator.seniority())
+                    .set(COLLABORATOR.START_DATE, collaborator.startDate())
+                    .where(COLLABORATOR.ID.eq(collaborator.id()))
+                    .and(COLLABORATOR.ORGANIZATION_ID.eq(organizationId))
+                    .execute();
+
+
+        this.context.deleteFrom(COLLABORATOR_SKILL).where(COLLABORATOR_SKILL.COLLABORATOR_ID.eq(collaborator.id())).execute();
+        List<CollaboratorSkillRecord> records = collaborator.skills()
+                .stream()
+                .map(skillLevel -> new CollaboratorSkillRecord(organizationId, collaborator.id(), skillLevel.skill().id(), skillLevel.proficiency()))
+                .collect(Collectors.toList());
+        this.context.batchInsert(records).execute();
+        return collaborator;
     }
 
     @Override
     @Transactional
     public void deleteById(UUID organizationId, UUID collaboratorId) {
-        this.context.deleteFrom(COLLABORATOR).where(COLLABORATOR.ID.eq(collaboratorId)).and(COLLABORATOR.ORGANIZATION_ID.eq(organizationId));
-        this.context.deleteFrom(COLLABORATOR_SKILL).where(COLLABORATOR_SKILL.COLLABORATOR_ID.eq(collaboratorId));
-        this.context.deleteFrom(TEAM_COLLABORATOR).where(TEAM_COLLABORATOR.COLLABORATOR_ID.eq(collaboratorId));
+        this.context.deleteFrom(COLLABORATOR_SKILL).where(COLLABORATOR_SKILL.COLLABORATOR_ID.eq(collaboratorId)).execute();
+        this.context.deleteFrom(TEAM_COLLABORATOR).where(TEAM_COLLABORATOR.COLLABORATOR_ID.eq(collaboratorId)).execute();
+        this.context.deleteFrom(COLLABORATOR).where(COLLABORATOR.ID.eq(collaboratorId)).and(COLLABORATOR.ORGANIZATION_ID.eq(organizationId)).execute();
     }
 
     @Override
@@ -116,6 +138,12 @@ public class CollaboratorAdapter implements CollaboratorPort {
     @Override
     public Set<Collaborator> findByName(UUID organizationId, String name) {
         Condition c = or(COLLABORATOR.FIRSTNAME.eq(name), COLLABORATOR.LASTNAME.eq(name));
+        return findByCondition(organizationId, c);
+    }
+
+    @Override
+    public Set<Collaborator> findByRole(UUID organizationId, String roleName) {
+        Condition c = COLLABORATOR.ROLE.eq(roleName);
         return findByCondition(organizationId, c);
     }
 
