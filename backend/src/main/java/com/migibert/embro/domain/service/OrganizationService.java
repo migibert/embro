@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -33,5 +34,9 @@ public class OrganizationService {
 
     public List<Organization> findAll() {
         return this.port.findAll();
+    }
+
+    public Set<Organization> findByIds(List<UUID> ids) {
+        return this.port.findByIds(ids);
     }
 }

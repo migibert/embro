@@ -4,6 +4,7 @@ import com.migibert.embro.domain.model.Organization;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public interface OrganizationPort {
@@ -14,4 +15,6 @@ public interface OrganizationPort {
     Optional<Organization> findById(UUID organizationId);
 
     List<Organization> findAll();
+
+    Set<Organization> findByIds(List<UUID> ids);
 }

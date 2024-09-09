@@ -7,6 +7,7 @@ package com.migibert.embro.infrastructure.persistence.model.tables;
 import com.migibert.embro.infrastructure.persistence.model.Keys;
 import com.migibert.embro.infrastructure.persistence.model.Public;
 import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorTable.CollaboratorPath;
+import com.migibert.embro.infrastructure.persistence.model.tables.OrganizationTable.OrganizationPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamTable.TeamPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.TeamCollaboratorRecord;
 
@@ -57,6 +58,11 @@ public class TeamCollaboratorTable extends TableImpl<TeamCollaboratorRecord> {
     public Class<TeamCollaboratorRecord> getRecordType() {
         return TeamCollaboratorRecord.class;
     }
+
+    /**
+     * The column <code>public.team_collaborator.organization_id</code>.
+     */
+    public final TableField<TeamCollaboratorRecord, UUID> ORGANIZATION_ID = createField(DSL.name("organization_id"), SQLDataType.UUID.nullable(false), this, "");
 
     /**
      * The column <code>public.team_collaborator.team_id</code>.
@@ -142,7 +148,19 @@ public class TeamCollaboratorTable extends TableImpl<TeamCollaboratorRecord> {
 
     @Override
     public List<ForeignKey<TeamCollaboratorRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.TEAM_COLLABORATOR__FK_TEAM_COLLABORATOR_TEAM, Keys.TEAM_COLLABORATOR__FK_TEAM_COLLABORATOR_COLLABORATOR);
+        return Arrays.asList(Keys.TEAM_COLLABORATOR__FK_TEAM_COLLABORATOR_ORGANIZATION, Keys.TEAM_COLLABORATOR__FK_TEAM_COLLABORATOR_TEAM, Keys.TEAM_COLLABORATOR__FK_TEAM_COLLABORATOR_COLLABORATOR);
+    }
+
+    private transient OrganizationPath _organization;
+
+    /**
+     * Get the implicit join path to the <code>public.organization</code> table.
+     */
+    public OrganizationPath organization() {
+        if (_organization == null)
+            _organization = new OrganizationPath(this, Keys.TEAM_COLLABORATOR__FK_TEAM_COLLABORATOR_ORGANIZATION, null);
+
+        return _organization;
     }
 
     private transient TeamPath _team;

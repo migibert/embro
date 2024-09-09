@@ -21,31 +21,45 @@ public class TeamCollaboratorRecord extends UpdatableRecordImpl<TeamCollaborator
     private static final long serialVersionUID = 1L;
 
     /**
+     * Setter for <code>public.team_collaborator.organization_id</code>.
+     */
+    public void setOrganizationId(UUID value) {
+        set(0, value);
+    }
+
+    /**
+     * Getter for <code>public.team_collaborator.organization_id</code>.
+     */
+    public UUID getOrganizationId() {
+        return (UUID) get(0);
+    }
+
+    /**
      * Setter for <code>public.team_collaborator.team_id</code>.
      */
     public void setTeamId(UUID value) {
-        set(0, value);
+        set(1, value);
     }
 
     /**
      * Getter for <code>public.team_collaborator.team_id</code>.
      */
     public UUID getTeamId() {
-        return (UUID) get(0);
+        return (UUID) get(1);
     }
 
     /**
      * Setter for <code>public.team_collaborator.collaborator_id</code>.
      */
     public void setCollaboratorId(UUID value) {
-        set(1, value);
+        set(2, value);
     }
 
     /**
      * Getter for <code>public.team_collaborator.collaborator_id</code>.
      */
     public UUID getCollaboratorId() {
-        return (UUID) get(1);
+        return (UUID) get(2);
     }
 
     // -------------------------------------------------------------------------
@@ -71,9 +85,10 @@ public class TeamCollaboratorRecord extends UpdatableRecordImpl<TeamCollaborator
     /**
      * Create a detached, initialised TeamCollaboratorRecord
      */
-    public TeamCollaboratorRecord(UUID teamId, UUID collaboratorId) {
+    public TeamCollaboratorRecord(UUID organizationId, UUID teamId, UUID collaboratorId) {
         super(TeamCollaboratorTable.TEAM_COLLABORATOR);
 
+        setOrganizationId(organizationId);
         setTeamId(teamId);
         setCollaboratorId(collaboratorId);
         resetChangedOnNotNull();

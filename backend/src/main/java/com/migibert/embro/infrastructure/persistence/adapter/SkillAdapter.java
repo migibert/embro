@@ -32,7 +32,7 @@ public class SkillAdapter implements SkillPort {
     }
 
     public void deleteById(UUID organizationId, UUID skillId) {
-        this.context.deleteFrom(SKILL).where(SKILL.ID.eq(skillId)).and(SKILL.ORGANIZATION_ID.eq(organizationId));
+        this.context.deleteFrom(SKILL).where(SKILL.ID.eq(skillId)).and(SKILL.ORGANIZATION_ID.eq(organizationId)).execute();
     }
 
     public Optional<Skill> findById(UUID organizationId, UUID id) {

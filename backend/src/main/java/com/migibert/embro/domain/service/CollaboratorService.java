@@ -5,7 +5,6 @@ import com.migibert.embro.domain.port.CollaboratorPort;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -47,6 +46,10 @@ public class CollaboratorService {
 
     public Set<Collaborator> findByTeam(UUID organizationId, UUID teamId) {
         return this.port.findByTeam(organizationId, teamId);
+    }
+
+    public Set<Collaborator> findByRole(UUID organizationId, String roleName) {
+        return this.port.findByRole(organizationId, roleName);
     }
 
     public Set<Collaborator> findAll(UUID organizationId) {

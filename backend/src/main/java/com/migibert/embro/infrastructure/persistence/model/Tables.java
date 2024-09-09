@@ -8,10 +8,12 @@ import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorSk
 import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.FlywaySchemaHistoryTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.OrganizationTable;
+import com.migibert.embro.infrastructure.persistence.model.tables.RoleTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.SeniorityTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.SkillTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamCollaboratorTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamTable;
+import com.migibert.embro.infrastructure.persistence.model.tables.UserOrganizationTable;
 
 
 /**
@@ -41,6 +43,11 @@ public class Tables {
     public static final OrganizationTable ORGANIZATION = OrganizationTable.ORGANIZATION;
 
     /**
+     * The table <code>public.role</code>.
+     */
+    public static final RoleTable ROLE = RoleTable.ROLE;
+
+    /**
      * The table <code>public.seniority</code>.
      */
     public static final SeniorityTable SENIORITY = SeniorityTable.SENIORITY;
@@ -59,4 +66,9 @@ public class Tables {
      * The table <code>public.team_collaborator</code>.
      */
     public static final TeamCollaboratorTable TEAM_COLLABORATOR = TeamCollaboratorTable.TEAM_COLLABORATOR;
+
+    /**
+     * The table <code>public.user_organization</code>.
+     */
+    public static final UserOrganizationTable USER_ORGANIZATION = UserOrganizationTable.USER_ORGANIZATION;
 }

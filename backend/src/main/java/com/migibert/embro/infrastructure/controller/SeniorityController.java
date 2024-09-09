@@ -2,11 +2,13 @@ package com.migibert.embro.infrastructure.controller;
 
 import com.migibert.embro.domain.model.Seniority;
 import com.migibert.embro.domain.service.SeniorityService;
+import com.migibert.embro.domain.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,15 +18,24 @@ import java.util.UUID;
 public class SeniorityController {
 
     private final SeniorityService service;
+    private final UserService userService;
 
     @RequestMapping("/")
-    public ResponseEntity list(@PathVariable("organizationId") UUID organizationId) {
+    public ResponseEntity list(Principal principal, @PathVariable("organizationId") UUID organizationId) {
+        String userId = principal.getName();
+        if(!userService.isAllowed(userId, organizationId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         Iterable<Seniority> seniorities = service.findAll(organizationId);
         return ResponseEntity.ok(seniorities);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
+    public ResponseEntity get(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
+        String userId = principal.getName();
+        if(!userService.isAllowed(userId, organizationId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         Optional<Seniority> seniority = service.findById(organizationId, id);
         if(seniority.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -33,7 +44,11 @@ public class SeniorityController {
     }
 
     @PostMapping("/")
-    public ResponseEntity create(@PathVariable("organizationId") UUID organizationId, @RequestBody Seniority seniority) {
+    public ResponseEntity create(Principal principal, @PathVariable("organizationId") UUID organizationId, @RequestBody Seniority seniority) {
+        String userId = principal.getName();
+        if(!userService.isAllowed(userId, organizationId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         if(seniority.id() != null) {
             return ResponseEntity.badRequest().body("id must be null");
         }
@@ -42,7 +57,11 @@ public class SeniorityController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
+    public ResponseEntity delete(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
+        String userId = principal.getName();
+        if(!userService.isAllowed(userId, organizationId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         service.delete(organizationId, id);
         return ResponseEntity.noContent().build();
     }

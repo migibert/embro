@@ -7,13 +7,16 @@ package com.migibert.embro.infrastructure.persistence.model.tables;
 import com.migibert.embro.infrastructure.persistence.model.Keys;
 import com.migibert.embro.infrastructure.persistence.model.Public;
 import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorSkillTable.CollaboratorSkillPath;
+import com.migibert.embro.infrastructure.persistence.model.tables.OrganizationTable.OrganizationPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.SkillTable.SkillPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamCollaboratorTable.TeamCollaboratorPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamTable.TeamPath;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.CollaboratorRecord;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
@@ -174,6 +177,23 @@ public class CollaboratorTable extends TableImpl<CollaboratorRecord> {
     @Override
     public UniqueKey<CollaboratorRecord> getPrimaryKey() {
         return Keys.COLLABORATOR_PKEY;
+    }
+
+    @Override
+    public List<ForeignKey<CollaboratorRecord, ?>> getReferences() {
+        return Arrays.asList(Keys.COLLABORATOR__FK_COLLABORATOR_ORGANIZATION);
+    }
+
+    private transient OrganizationPath _organization;
+
+    /**
+     * Get the implicit join path to the <code>public.organization</code> table.
+     */
+    public OrganizationPath organization() {
+        if (_organization == null)
+            _organization = new OrganizationPath(this, Keys.COLLABORATOR__FK_COLLABORATOR_ORGANIZATION, null);
+
+        return _organization;
     }
 
     private transient CollaboratorSkillPath _collaboratorSkill;

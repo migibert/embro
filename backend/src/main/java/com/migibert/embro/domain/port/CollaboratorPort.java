@@ -22,4 +22,6 @@ public interface CollaboratorPort {
     Set<Collaborator> findBySkill(UUID organizationId, UUID skillId);
 
     Set<Collaborator> findByName(UUID organizationId, String name);
+
+    Set<Collaborator> findByRole(UUID organizationId, String roleName);
 }
