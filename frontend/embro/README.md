@@ -15,10 +15,10 @@
 
 The application can be configured throug environment variables
 
-* EMBRO_API
-* AUTH_AUDIENCE
-* AUTH_DOMAIN
-* AUTH_CLIENT_ID
+* REACT_APP_EMBRO_API_BASE_URL
+* REACT_APP_AUTH0_AUDIENCE
+* REACT_APP_AUTH0_DOMAIN
+* REACT_APP_AUTH0_CLIENT_ID
 
 # Running locally
 
