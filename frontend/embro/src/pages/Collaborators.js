@@ -2,10 +2,10 @@ import { useAuth0 } from '@auth0/auth0-react';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { IconButton, Typography } from '@mui/material';
 import { React, useContext, useEffect, useState } from 'react';
-import CollaboratorForm from '../components/CollaboratorForm';
-import CollaboratorList from '../components/CollaboratorList';
 import { OrganizationContext } from '../context/OrganizationContext';
 import { createCollaborator, deleteCollaborator, listCollaborators, updateCollaborator } from '../utils/api';
+import CollaboratorForm from './CollaboratorForm';
+import CollaboratorList from './CollaboratorList';
 
 const Collaborators = () => {
   const { getAccessTokenSilently } = useAuth0();

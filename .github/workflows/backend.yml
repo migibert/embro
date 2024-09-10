@@ -12,8 +12,6 @@ jobs:
     defaults:
       run:
         working-directory: ./backend
-    env:
-      EXAMPLE: example # environment variable
     services:
       postgres:
         image: postgres
@@ -29,7 +27,7 @@ jobs:
         ports:
           - 5433:5432
     steps:
-      - name: Checkoout
+      - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Java 21 Temurin
         uses: actions/setup-java@v4
