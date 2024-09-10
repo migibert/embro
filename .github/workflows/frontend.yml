@@ -16,7 +16,7 @@ jobs:
       REACT_APP_EMBRO_API_BASE_URL: https://embro.io/api #To replace with cloudrun url
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.1.5
       - name: Install dependencies
