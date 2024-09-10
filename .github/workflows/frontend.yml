@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
     env:
       REACT_APP_EMBRO_API_BASE_URL: https://embro.io/api #To replace with cloudrun url
     steps:
