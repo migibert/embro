@@ -1,10 +1,12 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
-import { IconButton, List, ListItem, ListItemText, TextField, Typography } from '@mui/material';
+import { Grid2 as Grid, IconButton, List, ListItem, ListItemText, TextField, Typography } from '@mui/material';
 import { React, useContext, useEffect, useState } from 'react';
+import TeamCard from '../components/TeamCard';
 import { OrganizationContext } from '../context/OrganizationContext';
 import { createTeam, listTeams } from '../utils/api';
+
 
 const Teams = () => {
   const { getAccessTokenSilently } = useAuth0();
@@ -32,6 +34,19 @@ const Teams = () => {
     load();
   }, [getAccessTokenSilently, currentOrganization]);
 
+  return (
+    <div>
+      <Typography variant="h1">Teams</Typography>
+      <Grid container spacing={2} columns={12}>
+        {teams?.map((team) => (
+          <Grid item xs={4}>
+            <TeamCard team={team}/>
+          </Grid>
+        ))}
+      </Grid>
+    </div>
+  )
+  
   return (
     <div>
       <Typography variant="h1">Teams</Typography>
