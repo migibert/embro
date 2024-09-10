@@ -1,0 +1,39 @@
+name: release-backend
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      EXAMPLE: example # environment variable
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: sa
+          POSTGRES_PASSWORD: pwd
+          POSTGRES_DB: embro-test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5433:5432
+    steps:
+      - name: Checkoout
+        uses: actions/checkout@v4
+      - name: Setup Java 21 Temurin
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Run tests
+        run: mvn -Pdev test
+      - name: Package for production
+        run: mvn package -Pprod

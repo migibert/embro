@@ -72,8 +72,107 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.flywaydb</groupId>
+						<artifactId>flyway-maven-plugin</artifactId>
+						<version>10.17.0</version>
+						<executions>
+							<execution>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>migrate</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<url>jdbc:postgresql://localhost:5433/embro-test</url>
+							<user>sa</user>
+							<password>pwd</password>
+							<locations>
+								<location>filesystem:src/main/resources/db/migration</location>
+							</locations>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.jooq</groupId>
+						<artifactId>jooq-codegen-maven</artifactId>
+						<executions>
+							<execution>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<jdbc>
+								<driver>org.postgresql.Driver</driver>
+								<url>jdbc:postgresql://localhost:5433/embro-test</url>
+								<user>sa</user>
+								<password>pwd</password>
+							</jdbc>
+							<generator>
+								<database>
+									<includes>.*</includes>
+									<excludes></excludes>
+									<inputSchema>public</inputSchema>
+								</database>
+								<strategy>
+									<matchers>
+										<tables>
+											<table>
+												<tableClass>
+													<transform>PASCAL</transform>
+													<expression>$0_Table</expression>
+												</tableClass>
+											</table>
+										</tables>
+									</matchers>
+								</strategy>
+								<target>
+									<packageName>com.migibert.embro.infrastructure.persistence.model</packageName>
+									<directory>src/main/java</directory>
+								</target>
+							</generator>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<skipTests>true</skipTests>
+			</properties>
+		</profile>
+	</profiles>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-help-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>show-profiles</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>active-profiles</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -84,75 +183,6 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.flywaydb</groupId>
-				<artifactId>flyway-maven-plugin</artifactId>
-				<version>10.17.0</version>
-
-				<!-- Note that we're executing the Flyway plugin in the "generate-sources" phase -->
-				<executions>
-					<execution>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>migrate</goal>
-						</goals>
-					</execution>
-				</executions>
-
-				<!-- Note that we need to prefix the db/migration path with filesystem: to prevent Flyway
-                     from looking for our migration scripts only on the classpath -->
-				<configuration>
-					<url>jdbc:postgresql://localhost:5432/embro</url>
-					<user>sa</user>
-					<password>pwd</password>
-					<locations>
-						<location>filesystem:src/main/resources/db/migration</location>
-					</locations>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.jooq</groupId>
-				<artifactId>jooq-codegen-maven</artifactId>
-				<executions>
-					<execution>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<jdbc>
-						<driver>org.postgresql.Driver</driver>
-						<url>jdbc:postgresql://localhost:5432/embro</url>
-						<user>sa</user>
-						<password>pwd</password>
-					</jdbc>
-					<generator>
-						<database>
-							<includes>.*</includes>
-							<excludes></excludes>
-							<inputSchema>public</inputSchema>
-						</database>
-						<strategy>
-							<matchers>
-								<tables>
-									<table>
-										<tableClass>
-											<transform>PASCAL</transform>
-											<expression>$0_Table</expression>
-										</tableClass>
-									</table>
-								</tables>
-							</matchers>
-						</strategy>
-						<target>
-							<packageName>com.migibert.embro.infrastructure.persistence.model</packageName>
-							<directory>src/main/java</directory>
-						</target>
-					</generator>
 				</configuration>
 			</plugin>
 		</plugins>
