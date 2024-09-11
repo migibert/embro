@@ -5,10 +5,14 @@ on:
       - main
     paths:
       - 'backend/**'
+  workflow_dispatch:
 
 jobs:
-  test:
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     defaults:
       run:
         working-directory: ./backend
@@ -36,5 +40,20 @@ jobs:
           distribution: 'temurin'
       - name: Run tests
         run: mvn -Pdev test
-      - name: Package for production
-        run: mvn package -Pprod
+      - name: Build production artifact
+        run: mvn -Pprod package
+      - name: Build Docker image
+        run: docker build -t embro-api .
+      - uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          workload_identity_provider: '${{ secrets.GCP_WIF_PROVIDER }}'
+      - name: Building and pushing the image to GCR
+        uses: RafikFarhad/push-to-gcr-github-action@v5-rc1
+        with:
+          registry: gcr.io
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          image_name: embro-api
+          image_tag: ${{ github.sha }}, latest
+          dockerfile: ./Dockerfile
+          context: .
