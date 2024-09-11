@@ -9,6 +9,7 @@ on:
 
 jobs:
   release:
+    environment: production
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'
