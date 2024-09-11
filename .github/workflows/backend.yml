@@ -65,10 +65,11 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
+          context: .
           push: true          
           tags: |
-            gcr.io/my_project/embro-api:latest
-            gcr.io/my_project/embro-api:${{github.sha}}
+            gcr.io/${{secrets.GCP_PROJECT_ID}}/embro-api:latest
+            gcr.io/${{secrets.GCP_PROJECT_ID}}/embro-api:${{github.sha}}
           file: Dockerfile
