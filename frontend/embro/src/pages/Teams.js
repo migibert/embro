@@ -1,7 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
-import { Grid2 as Grid, IconButton, List, ListItem, ListItemText, TextField, Typography } from '@mui/material';
+import { Grid2 as Grid, Typography } from '@mui/material';
 import { React, useContext, useEffect, useState } from 'react';
 import TeamCard from '../components/TeamCard';
 import { OrganizationContext } from '../context/OrganizationContext';
@@ -46,7 +44,7 @@ const Teams = () => {
       </Grid>
     </div>
   )
-  
+  /**
   return (
     <div>
       <Typography variant="h1">Teams</Typography>
@@ -70,6 +68,7 @@ const Teams = () => {
       }
     </div>
   );
+  */
 };
 
 export default Teams;
