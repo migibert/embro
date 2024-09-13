@@ -56,7 +56,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Authorize Docker for GCR
+      - name: Authorize Docker for Artifact Repository
         run: gcloud auth configure-docker europe-west1-docker.pkg.dev
 
       - name: Set up Docker Buildx
