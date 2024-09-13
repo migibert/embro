@@ -1,11 +1,11 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Delete, Info, PersonAdd } from "@mui/icons-material";
+import { Delete, Group, Info } from "@mui/icons-material";
 import { Card, CardActions, CardContent, CardHeader, IconButton } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { OrganizationContext } from "../context/OrganizationContext";
 import { listTeamMembers } from "../utils/api";
 
-function TeamCard({team}) {
+function TeamCard({team, onDelete}) {
 
   const { currentOrganization } = useContext(OrganizationContext);
   const [members, setMembers] = useState([]);
@@ -34,16 +34,15 @@ function TeamCard({team}) {
         {members.map(member => (
           <div key={member.id}>{member.name}</div>
         ))}
-        Plouf
       </CardContent>
       <CardActions>
         <IconButton>
           <Info/>
         </IconButton>
         <IconButton>
-          <PersonAdd/>
+          <Group/>
         </IconButton>
-        <IconButton>
+        <IconButton onClick={() => onDelete(team)}>
           <Delete/>
         </IconButton>
       </CardActions>
