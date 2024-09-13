@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - 'frontend/**'
+  workflow_dispatch:
 
 jobs:
   test:
@@ -17,9 +18,40 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
+
       - name: Install dependencies
         run: npm install
-      - name: Build
+
+      - name: Build production artifact
         run: npm run build
+      
+      - uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          workload_identity_provider: '${{ secrets.GCP_WIF_PROVIDER }}'
+          service_account: '${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Authorize Docker for Artifact Repository
+        run: gcloud auth configure-docker europe-west1-docker.pkg.dev
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set date
+        id: date
+        run: echo "::set-output name=date::$(date '+%Y%m%d%H%M')"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend/embro
+          push: true
+          tags: |
+            europe-west1-docker.pkg.dev/${{secrets.GCP_PROJECT_ID}}/embro/embro-ui:latest
+            europe-west1-docker.pkg.dev/${{secrets.GCP_PROJECT_ID}}/embro/embro-ui:${{ steps.date.outputs.date }}
