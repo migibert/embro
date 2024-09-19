@@ -1,0 +1,65 @@
+function start_proxy() {
+    CLOUDSQL_CONNECTION_NAME=$1
+    if [ ! -f cloud-sql-proxy ]; then
+        curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.13.0/cloud-sql-proxy.linux.amd64
+        chmod +x cloud-sql-proxy
+    fi
+    ./cloud-sql-proxy --auto-iam-authn ${CLOUDSQL_CONNECTION_NAME} &
+    
+    if [ ! command -v psql &> /dev/null ]; then
+        apt install -y postgresql-client
+    fi
+
+    RETRY=5
+    SUCCESS=0
+    while [ ${SUCCESS} -ne 1 ] && [ ${RETRY} -gt 0 ]; do
+        LISTENING=$(netstat -ntlp | grep 5432)
+        SUCCESS=$?
+        RETRY=$((RETRY-1))
+        sleep 1
+    done
+}
+
+function init() {
+    CLOUDSQL_INSTANCE_NAME=$1
+    CLOUDSQL_USER=$2
+    CLOUDSQL_DB=$3
+    CLOUDSQL_SCHEMA=$4
+    ADMIN_ACCOUNT=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 10)
+    ADMIN_PASSWORD=$(tr -dc 'A-Za-z0-9!?%=' < /dev/urandom | head -c 15)
+
+    gcloud sql users create ${ADMIN_ACCOUNT} --instance=${CLOUDSQL_INSTANCE_NAME} --password=${ADMIN_PASSWORD}
+
+    PGPASSWORD=${ADMIN_PASSWORD} psql -h 127.0.0.1 -U ${ADMIN_ACCOUNT} --dbname ${CLOUDSQL_DB} -c 'GRANT ALL PRIVILEGES ON SCHEMA "'${CLOUDSQL_SCHEMA}'" TO "'${CLOUDSQL_USER}'"'
+
+    gcloud sql users delete ${ADMIN_ACCOUNT} --instance=${CLOUDSQL_INSTANCE_NAME} --quiet
+}
+
+function connect() {
+    CLOUDSQL_USER=$1
+    CLOUDSQL_DB=$2
+    psql -h 127.0.0.1 -U ${CLOUDSQL_USER} --dbname ${CLOUDSQL_DB}
+}
+
+function clean() {
+    pkill -9 cloud-sql-proxy
+}
+
+
+trap clean SIGTERM
+
+read -p "CLoudSQL connection name: " CLOUDSQL_CONNECTION_NAME
+read -p "CloudSQL User: " CLOUDSQL_USER
+read -p "CloudSQL Database: " CLOUDSQL_DB
+
+start_proxy ${CLOUDSQL_CONNECTION_NAME}
+
+if [ "$1" = 'init' ]; then
+    read -p "CloudSQL Schema: " CLOUDSQL_SCHEMA
+    CLOUDSQL_INSTANCE_NAME=$(echo $CLOUDSQL_CONNECTION_NAME | awk -F: '{ print $3 }')
+    init ${CLOUDSQL_INSTANCE_NAME} ${CLOUDSQL_USER} ${CLOUDSQL_DB} ${CLOUDSQL_SCHEMA}
+fi
+if [ "$1" = 'connect' ]; then
+    connect ${CLOUDSQL_USER} ${CLOUDSQL_DB}
+fi
+
