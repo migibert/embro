@@ -16,3 +16,4 @@ For setting the database up (by default IAM users do not have any privilege)
 
 > [!NOTE]
 > A temporary user is generated for according privilege to the Backend application dedicated service account. It is deleted at the end of the process.
+
