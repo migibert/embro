@@ -74,3 +74,6 @@ jobs:
           tags: |
             europe-west1-docker.pkg.dev/${{secrets.GCP_PROJECT_ID}}/embro/embro-api:latest
             europe-west1-docker.pkg.dev/${{secrets.GCP_PROJECT_ID}}/embro/embro-api:${{ steps.date.outputs.date }}
+
+      - name: Deploy infrastructure
+        uses: migibert/embro/.github/workflows/infrastructure.yml@main
