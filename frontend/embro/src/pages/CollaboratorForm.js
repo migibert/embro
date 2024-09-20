@@ -9,7 +9,7 @@ import { useContext, useEffect, useState } from "react";
 import { OrganizationContext } from "../context/OrganizationContext";
 import { listRoles, listSeniorities, listSkills } from "../utils/api";
 
-function CollaboratorForm({ collaborator, onSubmitted, onCancelled }) {
+function CollaboratorForm({ collaborator, onSave, onCancel }) {
   const { getAccessTokenSilently } = useAuth0();
   const { currentOrganization} = useContext(OrganizationContext);
 
@@ -55,7 +55,7 @@ function CollaboratorForm({ collaborator, onSubmitted, onCancelled }) {
       seniority: seniority,
       skills: skillLevels,
     }
-    onSubmitted(c);
+    onSave(c);
   };
 
   return (
@@ -181,7 +181,7 @@ function CollaboratorForm({ collaborator, onSubmitted, onCancelled }) {
         <Button variant="contained" color="success" onClick={save}>
           Save
         </Button>
-        <Button variant="outlined" color="error" onClick={onCancelled}>
+        <Button variant="outlined" color="error" onClick={onCancel}>
           Cancel
         </Button>
       </Stack>

@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import { OrganizationContext } from "../context/OrganizationContext";
 import { listTeamMembers } from "../utils/api";
 
-function TeamCard({team, onDelete}) {
+function TeamCard({team, onSelect, onDelete}) {
 
   const { currentOrganization } = useContext(OrganizationContext);
   const [members, setMembers] = useState([]);
@@ -36,7 +36,7 @@ function TeamCard({team, onDelete}) {
         ))}
       </CardContent>
       <CardActions>
-        <IconButton>
+        <IconButton onClick={() => onSelect(team)}>
           <Info/>
         </IconButton>
         <IconButton>

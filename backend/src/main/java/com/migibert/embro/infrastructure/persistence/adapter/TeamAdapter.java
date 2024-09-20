@@ -1,18 +1,18 @@
 package com.migibert.embro.infrastructure.persistence.adapter;
 
-import com.migibert.embro.domain.model.Team;
-import com.migibert.embro.domain.port.TeamPort;
-import com.migibert.embro.infrastructure.persistence.model.tables.records.TeamRecord;
-import org.jooq.DSLContext;
-import org.springframework.stereotype.Component;
+import static com.migibert.embro.infrastructure.persistence.model.Tables.*;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.migibert.embro.infrastructure.persistence.model.Tables.*;
+import org.jooq.DSLContext;
+import org.springframework.stereotype.Component;
+
+import com.migibert.embro.domain.model.Team;
+import com.migibert.embro.domain.port.TeamPort;
+import com.migibert.embro.infrastructure.persistence.model.tables.records.TeamRecord;
 
 @Component
 public class TeamAdapter implements TeamPort {
@@ -38,7 +38,7 @@ public class TeamAdapter implements TeamPort {
     }
 
     public void deleteById(UUID organizationId, UUID teamId) {
-        this.context.deleteFrom(TEAM).where(TEAM.ID.eq(teamId)).and(SKILL.ORGANIZATION_ID.eq(organizationId));
+        this.context.deleteFrom(TEAM).where(TEAM.ID.eq(teamId)).and(TEAM.ORGANIZATION_ID.eq(organizationId)).execute();
     }
 
     public Optional<Team> findById(UUID organizationId, UUID teamId) {

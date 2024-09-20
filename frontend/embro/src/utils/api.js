@@ -116,13 +116,17 @@ const listTeamMembers = async (token, organizationId, teamId) => {
     return _get(token, `${BASE_URL}/organizations/${organizationId}/teams/${teamId}/members/`); 
 };
 
-const createTeam = async (token, organizationId, name) => {
+const createTeam = async (token, organizationId, team) => {
     return _post(
         token,
         `${BASE_URL}/organizations/${organizationId}/teams/`, 
-        JSON.stringify({id: null, name: name})
+        JSON.stringify(team)
     );
 };
+
+const deleteTeam = async (token, organizationId, teamId) => {
+    return _delete(token, `${BASE_URL}/organizations/${organizationId}/teams/${teamId}`);
+}
 
 const listSkills = async (token, organizationId) => {
     return _get(token, `${BASE_URL}/organizations/${organizationId}/skills/`);
@@ -194,7 +198,7 @@ const deleteRole = async (token, organizationId, roleId) => {
 
 export {
     createCollaborator, createOrganization, createRole, createSeniority, createSkill, createTeam,
-    deleteCollaborator, deleteOrganization, deleteRole, deleteSeniority, deleteSkill,
+    deleteCollaborator, deleteOrganization, deleteRole, deleteSeniority, deleteSkill, deleteTeam,
     listCollaborators, listOrganizations, listRoles, listSeniorities, listSkills, listTeamMembers, listTeams, updateCollaborator
 };
 
