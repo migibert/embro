@@ -36,7 +36,7 @@ import org.jooq.impl.Internal;
  * A class modelling foreign key relationships and constraints of tables in
  * public.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Keys {
 
     // -------------------------------------------------------------------------
@@ -44,6 +44,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final UniqueKey<CollaboratorRecord> COLLABORATOR_PKEY = Internal.createUniqueKey(CollaboratorTable.COLLABORATOR, DSL.name("collaborator_pkey"), new TableField[] { CollaboratorTable.COLLABORATOR.ID }, true);
+    public static final UniqueKey<CollaboratorRecord> UNIQUE_EMAIL_ORGANIZATION = Internal.createUniqueKey(CollaboratorTable.COLLABORATOR, DSL.name("unique_email_organization"), new TableField[] { CollaboratorTable.COLLABORATOR.EMAIL, CollaboratorTable.COLLABORATOR.ORGANIZATION_ID }, true);
     public static final UniqueKey<CollaboratorSkillRecord> COLLABORATOR_SKILL_PKEY = Internal.createUniqueKey(CollaboratorSkillTable.COLLABORATOR_SKILL, DSL.name("collaborator_skill_pkey"), new TableField[] { CollaboratorSkillTable.COLLABORATOR_SKILL.COLLABORATOR_ID, CollaboratorSkillTable.COLLABORATOR_SKILL.SKILL_ID }, true);
     public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = Internal.createUniqueKey(FlywaySchemaHistoryTable.FLYWAY_SCHEMA_HISTORY, DSL.name("flyway_schema_history_pk"), new TableField[] { FlywaySchemaHistoryTable.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK }, true);
     public static final UniqueKey<OrganizationRecord> ORGANIZATION_PKEY = Internal.createUniqueKey(OrganizationTable.ORGANIZATION, DSL.name("organization_pkey"), new TableField[] { OrganizationTable.ORGANIZATION.ID }, true);

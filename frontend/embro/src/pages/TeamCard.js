@@ -1,24 +1,36 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Delete, Group, Info } from "@mui/icons-material";
-import { Card, CardActions, CardContent, CardHeader, IconButton } from "@mui/material";
+import { Cancel, Delete, Info, Save } from "@mui/icons-material";
+import { Card, CardActions, CardHeader, IconButton, TextField } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { OrganizationContext } from "../context/OrganizationContext";
-import { listTeamMembers } from "../utils/api";
 
-function TeamCard({team, onSelect, onDelete}) {
-
+function TeamCard({team, onDelete, onSave, onCancel}) {
   const { currentOrganization } = useContext(OrganizationContext);
-  const [members, setMembers] = useState([]);
+  const [editMode, setEditMode] = useState(false);
+  const [name, setName] = useState(team.name);
   const { getAccessTokenSilently } = useAuth0();
-  
+
+  const save = () => {
+    setEditMode(false);
+    const teamToSave = {id: team.id, name: name};
+    onSave(teamToSave);
+  };
+
+  const cancel = () => {
+    setEditMode(false);
+    if(onCancel) {
+      onCancel();
+    }
+  }
+
   useEffect(() => {
     const load = async () => {
-      if(!team) {
+      if(!team?.id) {
+        setEditMode(true);
         return;
       }
-      const token = await getAccessTokenSilently();
-      const loadedMembers = await listTeamMembers(token, currentOrganization.id, team.id);
-      setMembers(loadedMembers);
+      setName(team.name);
     }
     load();
   }, [team, currentOrganization, getAccessTokenSilently])
@@ -28,21 +40,36 @@ function TeamCard({team, onSelect, onDelete}) {
   }
 
   return (
-    <Card>
-      <CardHeader title={team?.name} />
-      <CardContent>
-        {members.map(member => (
-          <div key={member.id}>{member.name}</div>
-        ))}
-      </CardContent>
-      <CardActions>
-        <IconButton onClick={() => onSelect(team)}>
-          <Info/>
-        </IconButton>
-        <IconButton>
-          <Group/>
-        </IconButton>
-        <IconButton onClick={() => onDelete(team)}>
+    <Card sx={{ 
+      width: 200, 
+      height: 200,
+      justifyContent: 'space-between',
+      textAlign: 'center', 
+      backgroundColor: `hsl(${Math.random()*360}, 25%, 90%)` ,
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+      <CardHeader 
+        title={editMode === false ? team.name : <TextField size="small" value={name} onChange={(e) => setName(e.target.value)} />}
+        titleTypographyProps={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'wrap', fontSize: '1.3em' }}
+        action={
+          editMode && <>
+            <IconButton onClick={() => save()}>
+              <Save />
+            </IconButton>
+            <IconButton onClick={() => cancel()}>
+              <Cancel />
+            </IconButton>
+          </>
+        }
+      />
+      <CardActions sx={{ justifyContent: 'space-between'}}>
+        <Link to={`/teams/${team?.id}`}>
+          <IconButton disabled={!team?.id}>
+            <Info/>
+          </IconButton>
+        </Link>
+        <IconButton disabled={!team?.id} onClick={() => onDelete(team)}>
           <Delete/>
         </IconButton>
       </CardActions>

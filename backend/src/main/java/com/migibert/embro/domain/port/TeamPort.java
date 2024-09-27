@@ -1,5 +1,6 @@
 package com.migibert.embro.domain.port;
 
+import com.migibert.embro.domain.model.Member;
 import com.migibert.embro.domain.model.Team;
 
 import java.util.List;
@@ -18,7 +19,9 @@ public interface TeamPort {
 
     Set<Team> findAll(UUID organizationId);
 
-    void addMember(UUID organizationId, UUID teamId, UUID memberId);
+    Member addMember(UUID organizationId, UUID teamId, UUID memberId, boolean keyPlayer);
 
     void removeMember(UUID organizationId, UUID teamId, UUID memberId);
+
+    Set<Member> listMembers(UUID organizationId, UUID teamId);
 }

@@ -3,16 +3,15 @@ package com.migibert.embro;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.migibert.embro.domain.model.*;
+import com.migibert.embro.infrastructure.controller.dto.MemberDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.MockMvc;
@@ -111,7 +110,7 @@ class EmbroApplicationTests {
 		return create("/organizations/" + organization.id() + "/roles/", role, Role.class);
 	}
 	private Team createTeam(Organization organization, String name) throws Exception {
-		Team team = new Team(null, name);
+		Team team = new Team(null, name, null, null, null, null);
 		return create("/organizations/" + organization.id() + "/teams/", team, Team.class);
 	}
 
@@ -144,12 +143,24 @@ class EmbroApplicationTests {
 
 	@Test
 	void testMembershipManagement() throws Exception {
+		MemberDto dto = new MemberDto(true);
+		String json = mapper.writeValueAsString(dto);
+
 		String url = "/organizations/" + organization.id() + "/teams/" + team.id() + "/members/";
 		mvc.perform(get(url).principal(principal)).andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
-		mvc.perform(put(url + mikael.id()).principal(principal)).andExpect(status().isNoContent());
+		mvc.perform(put(url + mikael.id()).principal(principal).contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isOk());
 		MvcResult result = mvc.perform(get(url).principal(principal)).andExpect(status().isOk()).andExpect(jsonPath("$").isNotEmpty()).andReturn();
-		List<Collaborator> value = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
-		Assertions.assertEquals(mikael, value.get(0));
+		List<Member> value = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+		Member found = value.get(0);
+		Assertions.assertEquals(mikael.id(), found.collaboratorId());
+		Assertions.assertEquals(mikael.firstname(), found.firstname());
+		Assertions.assertEquals(mikael.lastname(), found.lastname());
+		Assertions.assertEquals(mikael.email(), found.email());
+		Assertions.assertEquals(mikael.role(), found.role());
+		Assertions.assertEquals(mikael.seniority(), found.seniority());
+		Assertions.assertEquals(mikael.startDate(), found.startDate());
+		Assertions.assertEquals(dto.keyPlayer(), found.keyPlayer());
+
 		mvc.perform(delete(url + mikael.id()).principal(principal)).andExpect(status().isNoContent());
 		mvc.perform(get(url).principal(principal)).andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
 	}

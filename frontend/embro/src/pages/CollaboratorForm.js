@@ -34,10 +34,10 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
       }
       const token = await getAccessTokenSilently();
       const loadedSkills = await listSkills(token, currentOrganization.id);
-      setAvailableSkills(loadedSkills.filter(s => !skillLevels.find(sl => sl.skill.id === s.id)));
       const loadedRoles = await listRoles(token, currentOrganization.id);
-      setAvailableRoles(loadedRoles);
       const loadedSeniorities = await listSeniorities(token, currentOrganization.id);
+      setAvailableSkills(loadedSkills.filter(s => !skillLevels.find(sl => sl.skill.id === s.id)));
+      setAvailableRoles(loadedRoles);
       setAvailableSeniorities(loadedSeniorities);
     }
     load();
@@ -63,23 +63,26 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
       <Typography variant="h2" sx={{ marginBottom: 2 }} columns>
         {collaborator ? 'Edit collaborator' : 'New collaborator'}
       </Typography>
-      <Stack direction={"row"} spacing={5} sx={{marginBottom: 2}}>
-        <Box component="fieldset" sx={{ width: '50%'}}>
+      <Stack direction={"column"} spacing={5} sx={{marginBottom: 2}}>
+        <Box component="fieldset">
           <legend>Personal Information</legend>
           <Stack sx={{ m: 2 }} direction={"row"} spacing={3}>
             <TextField
               required
+              fullWidth
               label="First Name"
               value={firstname}
               onChange={(e) => setFirstname(e.target.value)}
             />
             <TextField
               required
+              fullWidth
               label="Last Name"
               value={lastname}
               onChange={(e) => setLastname(e.target.value)}
             />
             <TextField
+              fullWidth
               required
               label="Email"
               value={email}
@@ -130,7 +133,7 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
             />
           </Stack>
         </Box>
-        <Box component="fieldset" sx={{ width: '50%', flexWrap: 'wrap'}}>
+        <Box component="fieldset" sx={{ flexWrap: 'wrap'}}>
           <legend>Skills</legend>
           <Stack sx={{ m: 2 }} direction={"row"} spacing={3}>
             <List 

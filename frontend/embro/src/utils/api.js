@@ -112,8 +112,27 @@ const listTeams = async (token, organizationId) => {
     return _get(token, `${BASE_URL}/organizations/${organizationId}/teams/`);
 };
 
+const getTeam = async (token, organizationId, teamId) => {
+    return _get(token, `${BASE_URL}/organizations/${organizationId}/teams/${teamId}`);
+};
+
 const listTeamMembers = async (token, organizationId, teamId) => {
     return _get(token, `${BASE_URL}/organizations/${organizationId}/teams/${teamId}/members/`); 
+};
+
+const addTeamMember = async (token, organizationId, teamId, collaboratorId, keyPlayer) => {
+    return _put(
+        token,
+        `${BASE_URL}/organizations/${organizationId}/teams/${teamId}/members/${collaboratorId}`,
+        JSON.stringify({keyPlayer: keyPlayer})
+    );
+};
+
+const removeTeamMember = async (token, organizationId, teamId, collaboratorId) => {
+    return _delete(
+        token,
+        `${BASE_URL}/organizations/${organizationId}/teams/${teamId}/members/${collaboratorId}`,
+    );
 };
 
 const createTeam = async (token, organizationId, team) => {
@@ -123,6 +142,14 @@ const createTeam = async (token, organizationId, team) => {
         JSON.stringify(team)
     );
 };
+
+const updateTeam = async (token, organizationId, team) => {
+    return _put(
+        token,
+        `${BASE_URL}/organizations/${organizationId}/teams/${team.id}`,
+        JSON.stringify(team)
+    );
+}
 
 const deleteTeam = async (token, organizationId, teamId) => {
     return _delete(token, `${BASE_URL}/organizations/${organizationId}/teams/${teamId}`);
@@ -197,8 +224,7 @@ const deleteRole = async (token, organizationId, roleId) => {
 
 
 export {
-    createCollaborator, createOrganization, createRole, createSeniority, createSkill, createTeam,
-    deleteCollaborator, deleteOrganization, deleteRole, deleteSeniority, deleteSkill, deleteTeam,
-    listCollaborators, listOrganizations, listRoles, listSeniorities, listSkills, listTeamMembers, listTeams, updateCollaborator
+    addTeamMember, createCollaborator, createOrganization, createRole, createSeniority, createSkill, createTeam, deleteCollaborator, deleteOrganization, deleteRole, deleteSeniority, deleteSkill, deleteTeam, getTeam,
+    listCollaborators, listOrganizations, listRoles, listSeniorities, listSkills, listTeamMembers, listTeams, removeTeamMember, updateCollaborator, updateTeam
 };
 

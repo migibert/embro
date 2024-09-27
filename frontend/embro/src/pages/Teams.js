@@ -1,33 +1,49 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { IconButton, Stack, Typography } from '@mui/material';
+import { Add } from '@mui/icons-material';
+import { Box, Card, CardActionArea, Stack, Typography } from '@mui/material';
 import { React, useContext, useEffect, useState } from 'react';
 import { OrganizationContext } from '../context/OrganizationContext';
-import { createTeam, deleteTeam, listTeams } from '../utils/api';
-import TeamDetails from './TeamDetails';
-import TeamList from './TeamList';
+import { createTeam, deleteTeam, listTeams, updateTeam } from '../utils/api';
+import TeamCard from './TeamCard';
+
 const Teams = () => {
   const { getAccessTokenSilently } = useAuth0();
   const { currentOrganization} = useContext(OrganizationContext);
   const [teams, setTeams] = useState([]);
   const [adding, setAdding] = useState(false);
-  const [selected, setSelected] = useState(null);
-  const showDetails = adding || selected;
+
+  const defaultTeam = {
+    id: null,
+    name: null,
+    description: null,
+  };
 
   const saveTeam = async (team) => {
     const token = await getAccessTokenSilently();
-    const created = await createTeam(token, currentOrganization.id, team);
-    setTeams([...teams, created]);
-    setAdding(false);
-    setSelected(null);
+    let saved = team;
+    if(team.id) {
+      saved = await updateTeam(token, currentOrganization.id, team);
+    } else {
+      saved = await createTeam(token, currentOrganization.id, team);
+      setTeams([...teams, saved].filter(t => t.id !== null));
+      setAdding(false);
+    }
   };
 
   const removeTeam = async (team) => {
-    console.log("team to remove: " + team);
-    const token = await getAccessTokenSilently();
-    await deleteTeam(token, currentOrganization.id, team.id);
     setTeams(teams.filter(t => t.id !== team.id));
-    setSelected(null);
+    if(team.id) {
+      const token = await getAccessTokenSilently();
+      await deleteTeam(token, currentOrganization.id, team.id);
+    }
+  }
+
+  const addTeam = async () => {
+    setAdding(true);
+  }
+
+  const cancelCreation = () => {
+    setAdding(false);
   }
 
   useEffect(() => {
@@ -45,35 +61,26 @@ const Teams = () => {
   return (
     <Stack spacing={4} alignItems={'baseline'}>
       <Typography variant="h1">Teams</Typography>
-      <TeamList 
-        teams={teams}
-        onSelect={(team) => setSelected(team)}
-        onDelete={(team) => {
-          setAdding(false);
-          setSelected(null);
-          removeTeam(team);
-        }}
-      />
-      {
-        showDetails ? (
-        <TeamDetails 
-          team={selected}
-          onSave={(submitted) => {
-            setAdding(false);
-            setSelected(null);
-            saveTeam(submitted)
-          }}
-          onCancel={() => {
-            setAdding(false);
-            setSelected(null);
-          }}
-        />
-        ) : (
-        <IconButton onClick={() => setAdding(true)}>
-          <AddCircleIcon/>
-        </IconButton>
-        )
-      }
+      <Box display={'flex'} flexWrap={'wrap'} alignItems={'stretch'} gap={2}>
+        {adding ? 
+          <TeamCard 
+            key="new-team" 
+            team={defaultTeam} 
+            onDelete={removeTeam} 
+            onSave={saveTeam} 
+            onCancel={cancelCreation} 
+          />
+          : 
+          <Card key="add-team" sx={{ width: 200, textAlign: 'center' }}>
+            <CardActionArea onClick={addTeam} sx={{ width: '100%', height: '100%'}}>
+              <Add sx={{ fontSize: 20 }}/>
+            </CardActionArea>
+          </Card>
+        }
+        {teams?.map((team) => (
+          <TeamCard key={team.id} team={team} onDelete={removeTeam} onSave={saveTeam}/>
+        ))}
+      </Box>
     </Stack>
   );
 };
