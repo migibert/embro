@@ -64,12 +64,12 @@ const Collaborators = () => {
       {(adding || selected) &&
         <CollaboratorForm 
           collaborator={selected}
-          onSubmitted={(submitted) => {
+          onSave={(submitted) => {
             setAdding(false);
             setSelected(null);
             saveCollaborator(submitted)
           }}
-          onCancelled={() => {
+          onCancel={() => {
             setAdding(false);
             setSelected(null);
           }}

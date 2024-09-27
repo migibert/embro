@@ -23,20 +23,22 @@ const Layout = () => {
         >
           <Toolbar />
           <Box sx={{ overflow: 'auto'}}>
-            {routes.map((item) => 
-              <ListItem button 
-                key={item.text} 
-                component={NavLink} 
-                to={item.path}
-                sx={{
-                  '&.active': {
-                    backgroundColor: 'lightgray',
-                  },
-                  color: 'text.primary',
-                }}
-              >
-                <ListItemText primary={item.text} />
-              </ListItem>
+            {routes
+              .filter((route) => route.menu === true)
+              .map((item) => 
+                <ListItem button 
+                  key={item.text} 
+                  component={NavLink} 
+                  to={item.path}
+                  sx={{
+                    '&.active': {
+                      backgroundColor: 'lightgray',
+                    },
+                    color: 'text.primary',
+                  }}
+                >
+                  <ListItemText primary={item.text} />
+                </ListItem>
             )}
           </Box>
         </Drawer>

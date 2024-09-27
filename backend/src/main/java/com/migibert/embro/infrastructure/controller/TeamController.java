@@ -1,10 +1,12 @@
 package com.migibert.embro.infrastructure.controller;
 
 import com.migibert.embro.domain.model.Collaborator;
+import com.migibert.embro.domain.model.Member;
 import com.migibert.embro.domain.model.Team;
 import com.migibert.embro.domain.service.CollaboratorService;
 import com.migibert.embro.domain.service.TeamService;
 import com.migibert.embro.domain.service.UserService;
+import com.migibert.embro.infrastructure.controller.dto.MemberDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -84,23 +86,23 @@ public class TeamController {
     }
 
     @GetMapping("/{teamId}/members/")
-    public ResponseEntity listMembers(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID id) {
+    public ResponseEntity listMembers(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID teamId) {
         String userId = principal.getName();
         if(!userService.isAllowed(userId, organizationId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        Set<Collaborator> members = collaboratorService.findByTeam(organizationId, id);
+        Set<Member> members = teamService.listMembers(organizationId, teamId);
         return ResponseEntity.ok(members);
     }
 
     @PutMapping("/{teamId}/members/{memberId}")
-    public ResponseEntity addMember(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID teamId, @PathVariable("memberId") UUID memberId) {
+    public ResponseEntity addMember(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("teamId") UUID teamId, @PathVariable("memberId") UUID memberId, @RequestBody MemberDto dto) {
         String userId = principal.getName();
         if(!userService.isAllowed(userId, organizationId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        teamService.addMember(organizationId, teamId, memberId);
-        return ResponseEntity.noContent().build();
+        Member added = teamService.addMember(organizationId, teamId, memberId, dto.keyPlayer());
+        return ResponseEntity.ok(added);
     }
 
     @DeleteMapping("/{teamId}/members/{memberId}")

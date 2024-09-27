@@ -74,6 +74,11 @@ public class TeamCollaboratorTable extends TableImpl<TeamCollaboratorRecord> {
      */
     public final TableField<TeamCollaboratorRecord, UUID> COLLABORATOR_ID = createField(DSL.name("collaborator_id"), SQLDataType.UUID.nullable(false), this, "");
 
+    /**
+     * The column <code>public.team_collaborator.key_player</code>.
+     */
+    public final TableField<TeamCollaboratorRecord, Boolean> KEY_PLAYER = createField(DSL.name("key_player"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("false"), SQLDataType.BOOLEAN)), this, "");
+
     private TeamCollaboratorTable(Name alias, Table<TeamCollaboratorRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }

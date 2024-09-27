@@ -74,6 +74,26 @@ public class TeamTable extends TableImpl<TeamRecord> {
      */
     public final TableField<TeamRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false), this, "");
 
+    /**
+     * The column <code>public.team.mission</code>.
+     */
+    public final TableField<TeamRecord, String> MISSION = createField(DSL.name("mission"), SQLDataType.VARCHAR(500), this, "");
+
+    /**
+     * The column <code>public.team.email</code>.
+     */
+    public final TableField<TeamRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(250), this, "");
+
+    /**
+     * The column <code>public.team.instant_message</code>.
+     */
+    public final TableField<TeamRecord, String> INSTANT_MESSAGE = createField(DSL.name("instant_message"), SQLDataType.VARCHAR(250), this, "");
+
+    /**
+     * The column <code>public.team.phone</code>.
+     */
+    public final TableField<TeamRecord, String> PHONE = createField(DSL.name("phone"), SQLDataType.VARCHAR(15), this, "");
+
     private TeamTable(Name alias, Table<TeamRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }

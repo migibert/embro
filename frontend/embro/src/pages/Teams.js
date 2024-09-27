@@ -1,23 +1,50 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import { Box, Button, Grid2 as Grid, Stack, TextField, Typography } from '@mui/material';
+import { Add } from '@mui/icons-material';
+import { Box, Card, CardActionArea, Stack, Typography } from '@mui/material';
 import { React, useContext, useEffect, useState } from 'react';
-import TeamCard from '../components/TeamCard';
 import { OrganizationContext } from '../context/OrganizationContext';
-import { createTeam, listTeams } from '../utils/api';
+import { createTeam, deleteTeam, listTeams, updateTeam } from '../utils/api';
+import TeamCard from './TeamCard';
 
 const Teams = () => {
   const { getAccessTokenSilently } = useAuth0();
   const { currentOrganization} = useContext(OrganizationContext);
   const [teams, setTeams] = useState([]);
   const [adding, setAdding] = useState(false);
-  const [newName, setNewName] = useState(null);
+
+  const defaultTeam = {
+    id: null,
+    name: null,
+    description: null,
+  };
+
+  const saveTeam = async (team) => {
+    const token = await getAccessTokenSilently();
+    let saved = team;
+    if(team.id) {
+      saved = await updateTeam(token, currentOrganization.id, team);
+    } else {
+      saved = await createTeam(token, currentOrganization.id, team);
+      setTeams([...teams, saved].filter(t => t.id !== null));
+      setAdding(false);
+    }
+  };
+
+  const removeTeam = async (team) => {
+    setTeams(teams.filter(t => t.id !== team.id));
+    if(team.id) {
+      const token = await getAccessTokenSilently();
+      await deleteTeam(token, currentOrganization.id, team.id);
+    }
+  }
 
   const addTeam = async () => {
-    const token = await getAccessTokenSilently();
-    const created = await createTeam(token, currentOrganization.id, newName);
-    setTeams([...teams, created]);
+    setAdding(true);
+  }
+
+  const cancelCreation = () => {
     setAdding(false);
-  };
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -32,38 +59,29 @@ const Teams = () => {
   }, [getAccessTokenSilently, currentOrganization]);
 
   return (
-    <div>
+    <Stack spacing={4} alignItems={'baseline'}>
       <Typography variant="h1">Teams</Typography>
-      <Grid container spacing={2} columns={12} justifyItems={'flex-start'} width={'fit-content'}>
+      <Box display={'flex'} flexWrap={'wrap'} alignItems={'stretch'} gap={2}>
+        {adding ? 
+          <TeamCard 
+            key="new-team" 
+            team={defaultTeam} 
+            onDelete={removeTeam} 
+            onSave={saveTeam} 
+            onCancel={cancelCreation} 
+          />
+          : 
+          <Card key="add-team" sx={{ width: 200, textAlign: 'center' }}>
+            <CardActionArea onClick={addTeam} sx={{ width: '100%', height: '100%'}}>
+              <Add sx={{ fontSize: 20 }}/>
+            </CardActionArea>
+          </Card>
+        }
         {teams?.map((team) => (
-          <Grid item xs>
-            <TeamCard team={team}/>
-          </Grid>
+          <TeamCard key={team.id} team={team} onDelete={removeTeam} onSave={saveTeam}/>
         ))}
-      </Grid>
-      <Box>
-        {!adding && (
-          <Box sx={{ mt: 4 }}>
-            <Button variant="contained" color="info" onClick={() => setAdding(true)}>
-              Add Team
-            </Button>
-          </Box>
-        )}
-        {adding && (
-        <Box sx={{ mt: 4 }}>
-          <TextField required id="new-team-name" label="Name" variant="filled" onChange={(e) => setNewName(e.target.value)}/>
-          <Stack direction={"row"} spacing={2} sx={{mt: 2}}>
-            <Button variant="contained" color="success" onClick={addTeam}>
-              Save
-            </Button>
-            <Button variant="contained" color="error" onClick={() => setAdding(false)}>
-              Cancel
-            </Button>
-          </Stack>
-        </Box>
-        )}
       </Box>
-    </div>
+    </Stack>
   );
 };
 

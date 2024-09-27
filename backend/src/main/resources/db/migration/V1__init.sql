@@ -39,6 +39,7 @@ CREATE TABLE COLLABORATOR(
     start_date DATE,
     seniority_name VARCHAR(100),
     CONSTRAINT fk_collaborator_organization FOREIGN KEY (organization_id) REFERENCES organization(id),
+    CONSTRAINT unique_email_organization UNIQUE (email, organization_id),
     PRIMARY KEY (id)
 );
 
@@ -57,14 +58,20 @@ CREATE TABLE TEAM(
     id UUID,
     organization_id UUID NOT NULL,
     name VARCHAR(100) NOT NULL,
+    mission VARCHAR(500),
+    email VARCHAR(250),
+    instant_message VARCHAR(250),
+    phone VARCHAR(15),
     PRIMARY KEY (id),
     CONSTRAINT fk_team_organization FOREIGN KEY (organization_id) REFERENCES organization(id)
 );
+
 
 CREATE TABLE TEAM_COLLABORATOR(
     organization_id UUID NOT NULL,
     team_id UUID NOT NULL,
     collaborator_id UUID NOT NULL,
+    key_player boolean NOT NULL DEFAULT false,
     PRIMARY KEY (team_id, collaborator_id),
     CONSTRAINT fk_team_collaborator_organization FOREIGN KEY (organization_id) REFERENCES organization(id),
     CONSTRAINT fk_team_collaborator_collaborator FOREIGN KEY (collaborator_id) REFERENCES collaborator(id),

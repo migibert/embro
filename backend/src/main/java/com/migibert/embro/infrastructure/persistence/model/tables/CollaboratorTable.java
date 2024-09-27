@@ -180,6 +180,11 @@ public class CollaboratorTable extends TableImpl<CollaboratorRecord> {
     }
 
     @Override
+    public List<UniqueKey<CollaboratorRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.UNIQUE_EMAIL_ORGANIZATION);
+    }
+
+    @Override
     public List<ForeignKey<CollaboratorRecord, ?>> getReferences() {
         return Arrays.asList(Keys.COLLABORATOR__FK_COLLABORATOR_ORGANIZATION);
     }
