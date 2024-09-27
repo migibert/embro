@@ -24,6 +24,7 @@ resource "google_sql_database_instance" "embro" {
   name             = "embro"
   database_version = "POSTGRES_15"
   region           = "europe-west1"
+  deletion_protection = false
 
   settings {
     tier      = "db-f1-micro"
