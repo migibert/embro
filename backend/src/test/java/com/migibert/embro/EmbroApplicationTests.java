@@ -4,22 +4,22 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.migibert.embro.domain.model.*;
 import com.migibert.embro.infrastructure.controller.dto.MemberDto;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.AbstractOAuth2Token;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -31,27 +31,33 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = TestConfiguration.class)
+@SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(MockitoExtension.class)
 class EmbroApplicationTests {
 
 	@Autowired
 	private MockMvc mvc;
 
+	@Value("${app.oauth2.userinfo.endpoint}")
+	private String userInfoEndpoint;
+	private MockRestServiceServer auth0Server;
+
 	@MockBean
 	private SecurityFilterChain mocked;
 
 	private Principal principal = () -> "test|rdm1234";
+
+	@Autowired
+	private RestTemplate template;
 
 	@Autowired
 	private ObjectMapper mapper;
@@ -67,22 +73,19 @@ class EmbroApplicationTests {
 	private Team team;
 	private Collaborator mikael;
 
-	/**@BeforeAll
-	void setupSpringSecurity() {
-		when(accessToken.getTokenValue()).thenReturn("token");
-		when(authentication.getCredentials()).thenReturn(accessToken);
-		mockServer = MockRestServiceServer.createServer(restTemplate);
-		mockServer.expect(ExpectedCount.manyTimes(), requestTo(userInfoEndpoint))
-				  .andExpect(method(HttpMethod.GET))
-				  .andRespond(
-					  withStatus(HttpStatus.OK)
-					  .contentType(MediaType.APPLICATION_JSON)
-					  .body("{\"email\": \"ab@cd.ef\"}")
-				  );
-	}*/
-
 	@BeforeAll
 	void setup() throws Exception {
+		auth0Server = MockRestServiceServer.createServer(template);
+		auth0Server.expect(requestTo(userInfoEndpoint)).andRespond(withSuccess("{\"email\":\"test@embro.io\"}", MediaType.APPLICATION_JSON));
+
+		AbstractOAuth2Token token = mock(AbstractOAuth2Token.class);
+		Authentication authentication = mock(Authentication.class);
+		SecurityContext context = mock(SecurityContext.class);
+		when(token.getTokenValue()).thenReturn("{\"email\": \"test@embro.io\"}");
+		when(authentication.getCredentials()).thenReturn(token);
+		when(context.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(context);
+
 		organization = createOrganization();
 
 		java = createSkill(organization, "Java");
