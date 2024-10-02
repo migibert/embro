@@ -2,7 +2,6 @@ package com.migibert.embro.domain.port;
 
 import com.migibert.embro.domain.model.Collaborator;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -23,5 +22,5 @@ public interface CollaboratorPort {
 
     Set<Collaborator> findByName(UUID organizationId, String name);
 
-    Set<Collaborator> findByRole(UUID organizationId, String roleName);
+    Set<Collaborator> findByPosition(UUID organizationId, String positionName);
 }

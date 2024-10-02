@@ -34,10 +34,10 @@ function MemberCard({member, onDelete, backgroundColor}) {
         titleTypographyProps={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'wrap' }}
       >
       </CardHeader>
-      <CardContent>        
-        <Tooltip title={`${collaborator.seniority} ${collaborator.role}`}>
+      <CardContent>
+        <Tooltip title={`${collaborator.seniority} ${collaborator.position}`}>
           <Typography variant="body2" color="textSecondary">{collaborator.seniority}</Typography>
-          <Typography variant="body2" color="textSecondary">{collaborator.role}</Typography>
+          <Typography variant="body2" color="textSecondary">{collaborator.position}</Typography>
         </Tooltip>
       </CardContent>
       <CardActions 

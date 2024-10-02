@@ -7,7 +7,7 @@ import utc from "dayjs/plugin/utc";
 
 import { useContext, useEffect, useState } from "react";
 import { OrganizationContext } from "../context/OrganizationContext";
-import { listRoles, listSeniorities, listSkills } from "../utils/api";
+import { listPositions, listSeniorities, listSkills } from "../utils/api";
 
 function CollaboratorForm({ collaborator, onSave, onCancel }) {
   const { getAccessTokenSilently } = useAuth0();
@@ -16,14 +16,14 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
   const [ email, setEmail ] = useState(collaborator?.email);
   const [ firstname, setFirstname ] = useState(collaborator?.firstname);
   const [ lastname, setLastname ] = useState(collaborator?.lastname);
-  const [ role, setRole ] = useState(collaborator?.role);
+  const [ position, setPosition ] = useState(collaborator?.position);
   const [ birthDate, setBirthDate ] = useState(collaborator?.birthDate ? dayjs(collaborator.birthDate) : null);
   const [ startDate, setStartDate ] = useState(collaborator?.startDate ? dayjs(collaborator.startDate) : null);
   const [ seniority, setSeniority ] = useState(collaborator?.seniority);
   const [ skillLevels, setSkillLevels ] = useState(collaborator?.skills || []);
   const [ availableSkills, setAvailableSkills] = useState([]);
   const [ availableSeniorities, setAvailableSeniorities] = useState([]);
-  const [ availableRoles, setAvailableRoles] = useState([]);
+  const [ availablePositions, setAvailablePositions] = useState([]);
 
   dayjs.extend(utc);
 
@@ -34,10 +34,10 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
       }
       const token = await getAccessTokenSilently();
       const loadedSkills = await listSkills(token, currentOrganization.id);
-      const loadedRoles = await listRoles(token, currentOrganization.id);
+      const loadedPositions = await listPositions(token, currentOrganization.id);
       const loadedSeniorities = await listSeniorities(token, currentOrganization.id);
       setAvailableSkills(loadedSkills.filter(s => !skillLevels.find(sl => sl.skill.id === s.id)));
-      setAvailableRoles(loadedRoles);
+      setAvailablePositions(loadedPositions);
       setAvailableSeniorities(loadedSeniorities);
     }
     load();
@@ -49,7 +49,7 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
       email: email,
       firstname: firstname,
       lastname: lastname,
-      role: role,
+      position: position,
       birthDate: birthDate?.utc().toDate(),
       startDate: startDate?.utc().toJSON(),
       seniority: seniority,
@@ -106,14 +106,14 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
             <Select
               sx={{ width: "50%" }}
               required
-              value={role}
-              defaultValue={availableRoles[0]}
-              label="Role"
-              onChange={(e) => setRole(e.target.value)}
+              value={position}
+              defaultValue={availablePositions[0]}
+              label="Position"
+              onChange={(e) => setPosition(e.target.value)}
             >
-              {availableRoles?.map((role) => (
-                <MenuItem key={role.name} value={role.name}>
-                  {role.name}
+              {availablePositions?.map((position) => (
+                <MenuItem key={position.name} value={position.name}>
+                  {position.name}
                 </MenuItem>
               ))}
             </Select>

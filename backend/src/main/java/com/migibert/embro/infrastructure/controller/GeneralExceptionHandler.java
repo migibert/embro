@@ -13,4 +13,9 @@ public class GeneralExceptionHandler {
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     public void handleConflict() {
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public void handleBadRequest() {
+    }
 }

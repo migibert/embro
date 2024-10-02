@@ -36,8 +36,8 @@ public class CollaboratorAdapter implements CollaboratorPort {
     public Collaborator create(UUID organizationId, Collaborator collaborator) {
         this.context
             .insertInto(COLLABORATOR)
-            .columns(COLLABORATOR.ID, COLLABORATOR.ORGANIZATION_ID, COLLABORATOR.FIRSTNAME, COLLABORATOR.LASTNAME, COLLABORATOR.BIRTH_DATE, COLLABORATOR.EMAIL, COLLABORATOR.ROLE, COLLABORATOR.SENIORITY_NAME, COLLABORATOR.START_DATE)
-            .values(collaborator.id(), organizationId, collaborator.firstname(), collaborator.lastname(), collaborator.birthDate(), collaborator.email(), collaborator.role(), collaborator.seniority(), collaborator.startDate())
+            .columns(COLLABORATOR.ID, COLLABORATOR.ORGANIZATION_ID, COLLABORATOR.FIRSTNAME, COLLABORATOR.LASTNAME, COLLABORATOR.BIRTH_DATE, COLLABORATOR.EMAIL, COLLABORATOR.POSITION, COLLABORATOR.SENIORITY_NAME, COLLABORATOR.START_DATE)
+            .values(collaborator.id(), organizationId, collaborator.firstname(), collaborator.lastname(), collaborator.birthDate(), collaborator.email(), collaborator.position(), collaborator.seniority(), collaborator.startDate())
             .returning()
             .fetchOne();
 
@@ -59,7 +59,7 @@ public class CollaboratorAdapter implements CollaboratorPort {
                     .set(COLLABORATOR.LASTNAME, collaborator.lastname())
                     .set(COLLABORATOR.BIRTH_DATE, collaborator.birthDate())
                     .set(COLLABORATOR.EMAIL, collaborator.email())
-                    .set(COLLABORATOR.ROLE, collaborator.role())
+                    .set(COLLABORATOR.POSITION, collaborator.position())
                     .set(COLLABORATOR.SENIORITY_NAME, collaborator.seniority())
                     .set(COLLABORATOR.START_DATE, collaborator.startDate())
                     .where(COLLABORATOR.ID.eq(collaborator.id()))
@@ -103,11 +103,11 @@ public class CollaboratorAdapter implements CollaboratorPort {
         String lastName = data.component4();
         LocalDate birthDate = data.component5();
         String email = data.component6();
-        String role = data.component7();
+        String position = data.component7();
         String seniority = data.component8();
         LocalDate startDate = data.component9();
         Set<SkillLevel> skills = data.component10().map(this::toDomainModel).stream().collect(Collectors.toSet());
-        return new Collaborator(id, email, firstName, lastName, role, birthDate, startDate, seniority, skills);
+        return new Collaborator(id, email, firstName, lastName, position, birthDate, startDate, seniority, skills);
     }
 
     private SkillLevel toDomainModel(Record2<SkillRecord, Integer> record) {
@@ -142,8 +142,8 @@ public class CollaboratorAdapter implements CollaboratorPort {
     }
 
     @Override
-    public Set<Collaborator> findByRole(UUID organizationId, String roleName) {
-        Condition c = COLLABORATOR.ROLE.eq(roleName);
+    public Set<Collaborator> findByPosition(UUID organizationId, String positionName) {
+        Condition c = COLLABORATOR.POSITION.eq(positionName);
         return findByCondition(organizationId, c);
     }
 
@@ -157,7 +157,7 @@ public class CollaboratorAdapter implements CollaboratorPort {
                 COLLABORATOR.LASTNAME,
                 COLLABORATOR.BIRTH_DATE,
                 COLLABORATOR.EMAIL,
-                COLLABORATOR.ROLE,
+                COLLABORATOR.POSITION,
                 COLLABORATOR.SENIORITY_NAME,
                 COLLABORATOR.START_DATE,
                 multiset(

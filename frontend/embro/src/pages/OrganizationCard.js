@@ -1,20 +1,18 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Cancel, Delete, Info, Save } from "@mui/icons-material";
+import { Cancel, Delete, PersonAdd, Save } from "@mui/icons-material";
 import { Card, CardActions, CardHeader, IconButton, TextField } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { OrganizationContext } from "../context/OrganizationContext";
 
-function TeamCard({team, onDelete, onSave, onCancel}) {
-  const { currentOrganization } = useContext(OrganizationContext);
+function OrganizationCard({organization, onDelete, onSave, onCancel}) {
   const [editMode, setEditMode] = useState(false);
-  const [name, setName] = useState(team.name);
+  const [name, setName] = useState(organization?.name);
   const { getAccessTokenSilently } = useAuth0();
 
   const save = () => {
     setEditMode(false);
-    const teamToSave = {id: team.id, name: name};
-    onSave(teamToSave);
+    const organizationToSave = {id: organization?.id, name: name};
+    onSave(organizationToSave);
   };
 
   const cancel = () => {
@@ -26,31 +24,27 @@ function TeamCard({team, onDelete, onSave, onCancel}) {
 
   useEffect(() => {
     const load = async () => {
-      if(!team?.id) {
+      if(!organization?.id) {
         setEditMode(true);
         return;
       }
-      setName(team.name);
+      setName(organization?.name);
     }
     load();
-  }, [team, currentOrganization, getAccessTokenSilently])
-
-  if(team === null) {
-    return <div/>;
-  }
+  }, [organization, getAccessTokenSilently])
 
   return (
-    <Card sx={{ 
-      width: 200, 
+    <Card sx={{
+      width: 250,
       height: 200,
       justifyContent: 'space-between',
-      textAlign: 'center', 
+      textAlign: 'center',
       backgroundColor: `hsl(${Math.random()*360}, 25%, 90%)` ,
       display: 'flex',
       flexDirection: 'column',
     }}>
       <CardHeader 
-        title={editMode === false ? team.name : <TextField size="small" value={name} onChange={(e) => setName(e.target.value)} />}
+        title={editMode === false ? organization?.name : <TextField size="large" value={name} onChange={(e) => setName(e.target.value)} />}
         titleTypographyProps={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'wrap', fontSize: '1.3em' }}
       />
       <CardActions sx={{ justifyContent: 'space-between'}}>
@@ -61,20 +55,22 @@ function TeamCard({team, onDelete, onSave, onCancel}) {
           <IconButton onClick={() => cancel()}>
             <Cancel />
           </IconButton>
-        </>}
+        </>
+        }
         {!editMode && <>
-          <Link to={`/teams/${team?.id}`}>
-            <IconButton disabled={!team?.id}>
-              <Info/>
+          <Link to={`/invitations?organizationId=${organization?.id}`}>
+            <IconButton disabled={!organization?.id}>
+              <PersonAdd />
             </IconButton>
           </Link>
-          <IconButton disabled={!team?.id} onClick={() => onDelete(team)}>
+          <IconButton disabled={!organization?.id} onClick={() => onDelete(organization)}>
             <Delete/>
           </IconButton>
-        </>}
+          </>
+      }
       </CardActions>
     </Card>
   );
 }
 
-export default TeamCard;
+export default OrganizationCard;

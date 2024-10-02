@@ -20,12 +20,12 @@ CREATE TABLE SKILL(
     CONSTRAINT fk_skill_organization FOREIGN KEY (organization_id) REFERENCES organization(id)
 );
 
-CREATE TABLE ROLE(
+CREATE TABLE POSITION(
     id UUID,
     organization_id UUID NOT NULL,
     name VARCHAR(100) NOT NULL,
     PRIMARY KEY (id),
-    CONSTRAINT fk_role_organization FOREIGN KEY (organization_id) REFERENCES organization(id)
+    CONSTRAINT fk_position_organization FOREIGN KEY (organization_id) REFERENCES organization(id)
 );
 
 CREATE TABLE COLLABORATOR(
@@ -34,7 +34,7 @@ CREATE TABLE COLLABORATOR(
     email VARCHAR (256) NOT NULL,
     firstname VARCHAR(256) NOT NULL,
     lastname VARCHAR(256) NOT NULL,
-    role VARCHAR(100) NOT NULL,
+    position VARCHAR(100) NOT NULL,
     birth_date DATE,
     start_date DATE,
     seniority_name VARCHAR(100),

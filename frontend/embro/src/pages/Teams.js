@@ -71,7 +71,7 @@ const Teams = () => {
             onCancel={cancelCreation} 
           />
           : 
-          <Card key="add-team" sx={{ width: 200, textAlign: 'center' }}>
+          <Card key="add-team" sx={{ width: 200, height: 200, textAlign: 'center' }}>
             <CardActionArea onClick={addTeam} sx={{ width: '100%', height: '100%'}}>
               <Add sx={{ fontSize: 20 }}/>
             </CardActionArea>

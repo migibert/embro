@@ -17,7 +17,7 @@ const TeamDetails = () => {
   const [team, setTeam] = useState();
   const [members, setMembers] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [colorsByRole, setColorsByRole] = useState({});
+  const [colorsByPosition, setColorsByPosition] = useState({});
   const [saturationsBySeniority, setSaturationsBySeniority] = useState({});
   const [lightnessesBySeniority, setLightnessesBySeniority] = useState({});
 
@@ -41,9 +41,9 @@ const TeamDetails = () => {
   };
 
   const getMemberColor = (member) => {
-    if(!colorsByRole[member.role]) {
-      colorsByRole[member.role] = 360 * Math.random();
-      setColorsByRole(colorsByRole);
+    if(!colorsByPosition[member.position]) {
+      colorsByPosition[member.position] = 360 * Math.random();
+      setColorsByPosition(colorsByPosition);
     }
     if(!saturationsBySeniority[member.seniority]) {
       saturationsBySeniority[member.seniority] = 25 + 25 * Math.random(); // 25-50%
@@ -54,8 +54,8 @@ const TeamDetails = () => {
       setLightnessesBySeniority(lightnessesBySeniority);
     }
     return `hsl(
-      ${colorsByRole[member.role]}, 
-      ${saturationsBySeniority[member.seniority]}%, 
+      ${colorsByPosition[member.position]},
+      ${saturationsBySeniority[member.seniority]}%,
       ${lightnessesBySeniority[member.seniority]}%
     )`;
   }

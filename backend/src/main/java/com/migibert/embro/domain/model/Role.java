@@ -1,8 +1,7 @@
 package com.migibert.embro.domain.model;
 
-import java.util.UUID;
-
-public record Role(
-        UUID id,
-        String name) {
+public enum Role {
+    OWNER, // can do everything
+    EDITOR, // can do creation/edition
+    VIEWER // can only view
 }
