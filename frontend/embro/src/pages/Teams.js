@@ -3,19 +3,20 @@ import { Add } from '@mui/icons-material';
 import { Box, Card, CardActionArea, Stack, Typography } from '@mui/material';
 import { React, useContext, useEffect, useState } from 'react';
 import { OrganizationContext } from '../context/OrganizationContext';
+import { UserContext } from '../context/UserContext';
 import { createTeam, deleteTeam, listTeams, updateTeam } from '../utils/api';
 import TeamCard from './TeamCard';
 
 const Teams = () => {
   const { getAccessTokenSilently } = useAuth0();
   const { currentOrganization} = useContext(OrganizationContext);
+  const { isAllowedToEdit } = useContext(UserContext);
   const [teams, setTeams] = useState([]);
   const [adding, setAdding] = useState(false);
 
   const defaultTeam = {
     id: null,
     name: null,
-    description: null,
   };
 
   const saveTeam = async (team) => {
@@ -69,16 +70,27 @@ const Teams = () => {
             onDelete={removeTeam} 
             onSave={saveTeam} 
             onCancel={cancelCreation} 
+            disabled={!isAllowedToEdit(currentOrganization.id)}
           />
-          : 
-          <Card key="add-team" sx={{ width: 200, height: 200, textAlign: 'center' }}>
-            <CardActionArea onClick={addTeam} sx={{ width: '100%', height: '100%'}}>
+          :
+          <Card key="add-team" sx={{ width: 250, height: 200, textAlign: 'center' }}>
+            <CardActionArea
+              disabled={!isAllowedToEdit(currentOrganization?.id)}
+              onClick={addTeam}
+              sx={{ width: '100%', height: '100%'}}
+            >
               <Add sx={{ fontSize: 20 }}/>
             </CardActionArea>
           </Card>
         }
         {teams?.map((team) => (
-          <TeamCard key={team.id} team={team} onDelete={removeTeam} onSave={saveTeam}/>
+          <TeamCard 
+            key={team.id}
+            team={team}
+            onDelete={removeTeam}
+            onSave={saveTeam}
+            disabled={!isAllowedToEdit(currentOrganization.id)}
+          />
         ))}
       </Box>
     </Stack>

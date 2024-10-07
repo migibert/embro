@@ -72,7 +72,7 @@ public class OrganizationAdapter implements OrganizationPort {
     }
 
     @Override
-    public Set<Organization> findByIds(List<UUID> ids) {
+    public Set<Organization> findByIds(Set<UUID> ids) {
         return this.context.selectFrom(ORGANIZATION).where(ORGANIZATION.ID.in(ids)).stream().map(this::toDomainModel).collect(Collectors.toSet());
     }
 

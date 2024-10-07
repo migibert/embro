@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,6 +25,10 @@ public class UserService {
         repository.addRole(userId, email, organizationId, role);
     }
 
+    public Map<UUID, Role> getRolesByOrganizationForUser(String userId) {
+        return repository.getRolesByOrganizationIdForUser(userId);
+    }
+
     public boolean hasAnyRole(String userId, UUID organizationId) {
         return repository.hasRoleIn(userId, organizationId, Role.values());
     }
@@ -32,14 +37,32 @@ public class UserService {
         return repository.hasRoleIn(userId, organizationId, roles);
     }
 
-    public Invitation invite(String invitedBy, String emailToInvite, UUID organizationId, Role role) {
+    public Invitation createInvitation(String invitedBy, String emailToInvite, UUID organizationId, Role role) {
         UUID token = UUID.randomUUID();
         Invitation toCreate = new Invitation(token, invitedBy, emailToInvite, organizationId, role);
         repository.createInvitation(toCreate);
         return toCreate;
     }
 
-    public Optional<Invitation> consumeInvitation(String userId, UUID id, String accessToken) {
+    public boolean deleteInvitation(String userId, UUID id) {
+        Optional<Invitation> found = repository.findInvitationById(id);
+        if(found.isEmpty()) {
+            throw new IllegalArgumentException("Invitation does not exist");
+        }
+        Invitation existing = found.get();
+        UUID organizationId = existing.organizationId();
+        if(!hasRoleIn(userId, organizationId, Role.OWNER)) {
+            return false;
+        }
+        repository.deleteInvitation(id);
+        return true;
+    }
+
+    public void deleteInvitationsByOrganizationId(UUID organizationId) {
+        repository.deleteInvitationsByOrganizationId(organizationId);
+    }
+
+    public Optional<Invitation> acceptInvitation(String userId, UUID id, String accessToken) {
         Optional<Invitation> found = repository.findInvitationById(id);
         if(found.isEmpty()) {
             return Optional.empty();
@@ -54,15 +77,47 @@ public class UserService {
         return Optional.of(invitation);
     }
 
-    public List<UUID> getOrganizations(String userId) {
-        return repository.getOrganizationIds(userId);
+    public List<User> getUsersByOrganizationId(UUID organizationId) {
+        return repository.getUsersByOrganizationId(organizationId);
     }
 
-    public List<User> getUsersByOrganizationId(UUID id) {
-        return repository.getUsersByOrganizationId(id);
+    public List<Invitation> getInvitationsByOrganizationId(UUID organizationId) {
+        return repository.getInvitationsByOrganizationId(organizationId);
     }
 
     public void updateUser(UUID organizationId, User user) {
+        Optional<User> stored = repository.getUser(organizationId, user.email());
+        if(stored.isEmpty()) {
+            throw new IllegalArgumentException("User does not exist");
+        }
         repository.updateUser(organizationId, user);
+    }
+
+    public void removeUserFromOrganizationById(String userId, UUID organizationId) {
+        Map<Role, Integer> roleCount = repository.userCountPerRole(organizationId);
+        roleCount.forEach((role, count) -> log.info("{} : {}", role, count));
+        Integer ownerCount = roleCount.get(Role.OWNER);
+        if(ownerCount == null) {
+            throw new NullPointerException("There should be at least 1 owner for an organization");
+        }
+        if(ownerCount.equals(1)) {
+            throw new IllegalArgumentException("Last Owner cannot be removed");
+        }
+        repository.deleteUserFromOrganization(userId, organizationId);
+    }
+
+    public void removeUserFromOrganizationByEmail(String email, UUID organizationId) {
+        String userId = repository.findUserIdByEmail(email, organizationId);
+        Map<Role, Integer> roleCount = repository.userCountPerRole(organizationId);
+        if(roleCount.get(Role.OWNER) == 1) {
+            if(repository.hasRoleIn(userId, organizationId, Role.OWNER)) {
+                throw new IllegalArgumentException("Last Owner cannot be removed");
+            }
+        }
+        repository.deleteUserFromOrganization(userId, organizationId);
+    }
+
+    public String getEmailFromAccessToken(String accessToken) {
+        return repository.findUserEmail(accessToken);
     }
 }

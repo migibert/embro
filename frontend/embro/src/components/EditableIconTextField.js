@@ -2,7 +2,7 @@ import { Cancel, Edit, Save } from "@mui/icons-material";
 import { Box, IconButton, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 
-function EditableIconTextField({icon, value, onSave}) {
+function EditableIconTextField({icon, value, onSave, disabled}) {
   const [text, setText] = useState(value);
   const [editing, setEditing] = useState(false);
 
@@ -35,7 +35,12 @@ function EditableIconTextField({icon, value, onSave}) {
           </IconButton>
         </>
         :
-        <IconButton edge="end" aria-label="edit" onClick={() => setEditing(true)}>
+        <IconButton
+          edge="end"
+          aria-label="edit"
+          disabled={disabled}
+          onClick={() => setEditing(true)}
+        >
           <Edit />
         </IconButton>
       }

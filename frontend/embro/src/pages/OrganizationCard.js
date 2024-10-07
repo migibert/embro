@@ -1,13 +1,18 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { Cancel, Delete, PersonAdd, Save } from "@mui/icons-material";
 import { Card, CardActions, CardHeader, IconButton, TextField } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { OrganizationContext } from "../context/OrganizationContext";
+import { getOrganizationColor } from "../utils/Colors";
 
-function OrganizationCard({organization, onDelete, onSave, onCancel}) {
+function OrganizationCard({organization, onDelete, onSave, onCancel, onSelect, disabled}) {
   const [editMode, setEditMode] = useState(false);
   const [name, setName] = useState(organization?.name);
-  const { getAccessTokenSilently } = useAuth0();
+  const { currentOrganization, setCurrentOrganization } = useContext(OrganizationContext);
+
+  const isSelected = () => {
+    return organization?.id === currentOrganization?.id;
+  }
 
   const save = () => {
     setEditMode(false);
@@ -31,19 +36,23 @@ function OrganizationCard({organization, onDelete, onSave, onCancel}) {
       setName(organization?.name);
     }
     load();
-  }, [organization, getAccessTokenSilently])
+  }, [organization])
 
   return (
-    <Card sx={{
-      width: 250,
-      height: 200,
-      justifyContent: 'space-between',
-      textAlign: 'center',
-      backgroundColor: `hsl(${Math.random()*360}, 25%, 90%)` ,
-      display: 'flex',
-      flexDirection: 'column',
-    }}>
-      <CardHeader 
+    <Card
+      onClick={() => onSelect(organization)}
+      sx={{
+        border: isSelected() ? '2px solid black' : 'none',
+        width: 250,
+        height: 200,
+        justifyContent: 'space-between',
+        textAlign: 'center',
+        backgroundColor: getOrganizationColor(organization?.id, 80),
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <CardHeader
         title={editMode === false ? organization?.name : <TextField size="large" value={name} onChange={(e) => setName(e.target.value)} />}
         titleTypographyProps={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'wrap', fontSize: '1.3em' }}
       />
@@ -57,16 +66,19 @@ function OrganizationCard({organization, onDelete, onSave, onCancel}) {
           </IconButton>
         </>
         }
-        {!editMode && <>
-          <Link to={`/invitations?organizationId=${organization?.id}`}>
-            <IconButton disabled={!organization?.id}>
+        {!editMode && !disabled && <>
+          <Link
+            onClick={() => setCurrentOrganization(organization)} 
+            to={'/users'}
+          >
+            <IconButton>
               <PersonAdd />
             </IconButton>
           </Link>
-          <IconButton disabled={!organization?.id} onClick={() => onDelete(organization)}>
+          <IconButton onClick={() => onDelete(organization)}>
             <Delete/>
           </IconButton>
-          </>
+        </>
       }
       </CardActions>
     </Card>

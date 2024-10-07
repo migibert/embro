@@ -3,6 +3,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { IconButton, Typography } from '@mui/material';
 import { React, useContext, useEffect, useState } from 'react';
 import { OrganizationContext } from '../context/OrganizationContext';
+import { UserContext } from '../context/UserContext';
 import { createCollaborator, deleteCollaborator, listCollaborators, updateCollaborator } from '../utils/api';
 import CollaboratorForm from './CollaboratorForm';
 import CollaboratorList from './CollaboratorList';
@@ -10,6 +11,7 @@ import CollaboratorList from './CollaboratorList';
 const Collaborators = () => {
   const { getAccessTokenSilently } = useAuth0();
   const { currentOrganization} = useContext(OrganizationContext);
+  const { isAllowedToEdit} = useContext(UserContext);
   const [collaborators, setCollaborators] = useState([]);
   const [adding, setAdding] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -48,6 +50,7 @@ const Collaborators = () => {
     <div>
       <Typography variant="h1">Collaborators</Typography>
       <CollaboratorList 
+        disabled={!isAllowedToEdit(currentOrganization.id)}
         collaborators={collaborators}
         onDelete={(id) => {
           setAdding(false);
@@ -56,13 +59,17 @@ const Collaborators = () => {
         }}
         onSelect={(c) => setSelected(c)}/>
       {!adding && !selected && (
-        <IconButton onClick={() => setAdding(true)}>
+        <IconButton
+          disabled={!isAllowedToEdit(currentOrganization.id)}
+          onClick={() => setAdding(true)}
+        >
           <AddCircleIcon/>
         </IconButton>
       )}
       
       {(adding || selected) &&
-        <CollaboratorForm 
+        <CollaboratorForm
+          disabled={!isAllowedToEdit(currentOrganization.id)}
           collaborator={selected}
           onSave={(submitted) => {
             setAdding(false);

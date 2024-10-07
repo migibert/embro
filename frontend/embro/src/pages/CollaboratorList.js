@@ -1,7 +1,7 @@
 import { Delete } from "@mui/icons-material";
 import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 
-function CollaboratorList({collaborators, onDelete, onSelect}) {
+function CollaboratorList({collaborators, onDelete, onSelect, disabled}) {
   const columns = [
     { label: 'First name' },
     { label: 'Last name' },
@@ -38,7 +38,10 @@ function CollaboratorList({collaborators, onDelete, onSelect}) {
                 <TableCell colSpan="2">{new Date(collaborator.birthDate).toLocaleDateString()}</TableCell>
                 <TableCell colSpan="2">{new Date(collaborator.startDate).toLocaleDateString()}</TableCell>
                 <TableCell colSpan="2">
-                  <IconButton onClick={() => onDelete(collaborator.id)}>
+                  <IconButton 
+                    onClick={() => onDelete(collaborator.id)}
+                    disabled={disabled}
+                  >
                     <Delete />
                   </IconButton>
                 </TableCell>

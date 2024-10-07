@@ -5,6 +5,7 @@ import { React, useContext, useEffect, useState } from 'react';
 import { Link, useParams } from "react-router-dom";
 import EditableIconTextField from '../components/EditableIconTextField';
 import { OrganizationContext } from '../context/OrganizationContext';
+import { UserContext } from '../context/UserContext';
 import { addTeamMember, getTeam, listTeamMembers, removeTeamMember, updateTeam } from '../utils/api';
 import MemberCard from './MemberCard';
 import TeamCollaboratorListDialog from './TeamCollaboratorListDialog';
@@ -13,6 +14,7 @@ import TeamCollaboratorListDialog from './TeamCollaboratorListDialog';
 const TeamDetails = () => {
   let { teamId } = useParams();
   const { currentOrganization } = useContext(OrganizationContext);
+  const { isAllowedToEdit } = useContext(UserContext);
   const { getAccessTokenSilently } = useAuth0();
   const [team, setTeam] = useState();
   const [members, setMembers] = useState([]);
@@ -82,15 +84,36 @@ const TeamDetails = () => {
       <Typography variant='h1'>{team?.name}</Typography>
       <Box>
         <Typography variant='h2'>Mission</Typography>
-        <EditableIconTextField fullWidth icon={<AdsClick />} value={team?.mission} onSave={(v) => save({...team, mission: v})} />
+        <EditableIconTextField 
+          fullWidth
+          icon={<AdsClick />}
+          disabled={!isAllowedToEdit(currentOrganization.id)}
+          value={team?.mission}
+          onSave={(v) => save({...team, mission: v})} 
+        />
       </Box>
       <Box display={'flex'} gap={2}>
         <Box flexGrow={1} mr={4}>
           <Typography variant='h2'>Contacts</Typography>
           <Box display={'flex'} flexDirection={'column'} gap={1}>
-            <EditableIconTextField icon={<Mail />} value={team?.email} onSave={(v) => save({...team, email: v})} />
-            <EditableIconTextField icon={<Phone />} value={team?.phone} onSave={(v) => save({...team, phone: v})} />
-            <EditableIconTextField icon={<ChatBubble />} value={team?.instantMessage} onSave={(v) => save({...team, instantMessage: v})} />
+            <EditableIconTextField
+              icon={<Mail />}
+              disabled={!isAllowedToEdit(currentOrganization.id)}
+              value={team?.email}
+              onSave={(v) => save({...team, email: v})}
+            />
+            <EditableIconTextField
+              icon={<Phone />}
+              disabled={!isAllowedToEdit(currentOrganization.id)}
+              value={team?.phone}
+              onSave={(v) => save({...team, phone: v})}
+            />
+            <EditableIconTextField
+              icon={<ChatBubble />}
+              disabled={!isAllowedToEdit(currentOrganization.id)}
+              value={team?.instantMessage}
+              onSave={(v) => save({...team, instantMessage: v})} 
+            />
           </Box>
         </Box>
         <Box flexGrow={1} ml={4}>
@@ -103,7 +126,11 @@ const TeamDetails = () => {
       <Box>
         <Stack direction={'row'} spacing={5}>
           <Typography variant='h2'>Members</Typography>
-          <IconButton size='large' onClick={() => setOpenDialog(true)}>
+          <IconButton 
+            disabled={!isAllowedToEdit(currentOrganization.id)}
+            size='large'
+            onClick={() => setOpenDialog(true)}
+          >
             <PersonAdd fontSize='2rem'/>
           </IconButton>
           <TeamCollaboratorListDialog

@@ -3,11 +3,13 @@ import { Box, Grid2 as Grid, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import FieldsetList from "../components/FieldsetList";
 import { OrganizationContext } from "../context/OrganizationContext";
+import { UserContext } from "../context/UserContext";
 import { createPosition, createSeniority, createSkill, deletePosition, deleteSeniority, deleteSkill, listPositions, listSeniorities, listSkills } from "../utils/api";
 
 function OrganizationSettings() {
   const { getAccessTokenSilently } = useAuth0();
   const { currentOrganization } = useContext(OrganizationContext);
+  const { userInfos, isAllowedToEdit } = useContext(UserContext);
   const [skills, setSkills] = useState([]);
   const [seniorities, setSeniorities] = useState([]);
   const [positions, setPositions] = useState([]);
@@ -49,20 +51,17 @@ function OrganizationSettings() {
   }
 
   useEffect(() => {
-    const loadSeniorities = async () => {
-      const token = await getAccessTokenSilently();
+    const loadSeniorities = async (token) => {
       const loadedSeniorities = await listSeniorities(token, currentOrganization.id);
       setSeniorities(loadedSeniorities);
     };
 
-    const loadPositions = async () => {
-      const token = await getAccessTokenSilently();
+    const loadPositions = async (token) => {
       const loadedPositions = await listPositions(token, currentOrganization.id);
       setPositions(loadedPositions);
     };
 
-    const loadSkills = async () => {
-      const token = await getAccessTokenSilently();
+    const loadSkills = async (token) => {
       const loadedSkills = await listSkills(token, currentOrganization.id);
       setSkills(loadedSkills);
     };
@@ -71,10 +70,11 @@ function OrganizationSettings() {
       if(!currentOrganization) {
         return;
       }
+      const token = await getAccessTokenSilently();
       await Promise.all([
-        loadSkills(), 
-        loadPositions(), 
-        loadSeniorities()
+        loadSkills(token), 
+        loadPositions(token), 
+        loadSeniorities(token)
       ]);
     };
     load();
@@ -86,9 +86,13 @@ function OrganizationSettings() {
   return (
     <Box>
       <Typography variant='h1'>Settings</Typography>
+      {console.log(userInfos)}
+      {console.log(currentOrganization)}
+      {console.log(isAllowedToEdit(currentOrganization?.id))}
       <Grid container spacing={2} columns={12}>
         <Grid size={4}>
           <FieldsetList 
+            disabled={!isAllowedToEdit(currentOrganization?.id)}
             title='Skills' 
             items={skills} 
             onSave={(name) => addSkill(name)} 
@@ -96,7 +100,8 @@ function OrganizationSettings() {
           />
         </Grid>
         <Grid size={4}>
-          <FieldsetList 
+          <FieldsetList
+            disabled={!isAllowedToEdit(currentOrganization?.id)}
             title='Positions' 
             items={positions} 
             onSave={(name) => addPosition(name)} 
@@ -104,7 +109,8 @@ function OrganizationSettings() {
           />
         </Grid>
         <Grid size={4}>
-          <FieldsetList 
+          <FieldsetList
+            disabled={!isAllowedToEdit(currentOrganization?.id)}
             title='Seniorities' 
             items={seniorities} 
             onSave={(name) => addSeniority(name)} 

@@ -6,6 +6,7 @@ import OrganizationSettings from "../pages/OrganizationSettings";
 import Profile from "../pages/Profile";
 import TeamDetails from "../pages/TeamDetails";
 import TeamList from "../pages/Teams";
+import Users from "../pages/Users";
 
 const routes = [
     { text: 'Home', path: '/home', component: <Home />, menu: true, requireOrganization: false},
@@ -13,9 +14,10 @@ const routes = [
     { text: 'Teams', path: '/teams', component: <TeamList />, menu: true, requireOrganization: true},
     { text: 'Team', path: '/teams/:teamId', component: <TeamDetails />, menu: false, requireOrganization: true},
     { text: 'Collaborators', path: '/collaborators', component: <Collaborators />, menu: true, requireOrganization: true},
+    { text: 'Invitation', path: '/invitations', component: <Invitations />, menu: false, requireOrganization: true},
+    { text: 'Invitation', path: '/invitations/:invitationId', component: <Invitations />, menu: false, requireOrganization: true},
+    { text: 'Users', path: '/users', component: <Users />, menu: true, requireOrganization: true},
     { text: 'Profile', path: '/profile', component: <Profile />, menu: true, requireOrganization: true},
-    { text: 'Invitation', path:'/invitations', component: <Invitations />, menu: false, requireOrganization: true},
-    { text: 'Invitation', path:'/invitations/:invitationId', component: <Invitations />, menu: false, requireOrganization: true},
 ];
 
 export default routes;

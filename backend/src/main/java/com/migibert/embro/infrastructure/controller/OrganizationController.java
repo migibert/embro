@@ -14,9 +14,7 @@ import org.springframework.security.oauth2.core.AbstractOAuth2Token;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/organizations")
@@ -28,9 +26,9 @@ public class OrganizationController {
     @GetMapping("/")
     public ResponseEntity list(Principal principal) {
         String userId = principal.getName();
-        List<UUID> organizationsIds = userService.getOrganizations(userId);
-        Iterable<Organization> organizations = service.findByIds(organizationsIds);
-        return ResponseEntity.ok(organizations);
+        Map<UUID, Role> rolesByOrganization = userService.getRolesByOrganizationForUser(userId);
+        Set<Organization> result = service.findByIds(rolesByOrganization.keySet());
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
@@ -46,7 +44,7 @@ public class OrganizationController {
         return ResponseEntity.ok(organization.get());
     }
 
-    @GetMapping("/{organizationId}/users")
+    @GetMapping("/{organizationId}/users/")
     public ResponseEntity getUsers(Principal principal, @PathVariable("organizationId") UUID organizationId) {
         String userId = principal.getName();
         if(!userService.hasAnyRole(userId, organizationId)) {
@@ -60,14 +58,38 @@ public class OrganizationController {
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/{organizationId}/users")
-    public ResponseEntity updateUser(Principal principal, @PathVariable("organizationId") UUID organizationId, @RequestBody User user) {
-        String userId = principal.getName();
-        if(!userService.hasRoleIn(userId, organizationId, Role.OWNER)) {
+    @PutMapping("/{organizationId}/users/{email}")
+    public ResponseEntity updateUser(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("email") String email, @RequestBody User user) {
+        String principalUserId = principal.getName();
+        if(!userService.hasRoleIn(principalUserId, organizationId, Role.OWNER)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if(!email.equals(user.email())) {
+            return ResponseEntity.badRequest().build();
         }
         userService.updateUser(organizationId, user);
         return ResponseEntity.ok(user);
+    }
+
+    @DeleteMapping("/{organizationId}/users/{email}")
+    public ResponseEntity deleteUser(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("email") String email) {
+        String principalUserId = principal.getName();
+
+        // Remove a user other than self
+        if(userService.hasRoleIn(principalUserId, organizationId, Role.OWNER)) {
+            userService.removeUserFromOrganizationByEmail(email, organizationId);
+            return ResponseEntity.noContent().build();
+        }
+
+        // Leave the organization
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AbstractOAuth2Token token = (AbstractOAuth2Token) authentication.getCredentials();
+        String principalEmail = userService.getEmailFromAccessToken(token.getTokenValue());
+        if(email.equals(principalEmail)) {
+            userService.removeUserFromOrganizationByEmail(email, organizationId);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/")
@@ -75,10 +97,10 @@ public class OrganizationController {
         if(organization.id() != null) {
             return ResponseEntity.badRequest().body("id must be null");
         }
-        Organization saved = service.create(organization);
         String userId = principal.getName();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AbstractOAuth2Token token = (AbstractOAuth2Token) authentication.getCredentials();
+        Organization saved = service.create(organization);
         userService.addRole(userId, saved.id(), Role.OWNER, token.getTokenValue());
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
@@ -89,6 +111,7 @@ public class OrganizationController {
         if(!userService.hasRoleIn(userId, id, Role.OWNER)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        userService.deleteInvitationsByOrganizationId(id);
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

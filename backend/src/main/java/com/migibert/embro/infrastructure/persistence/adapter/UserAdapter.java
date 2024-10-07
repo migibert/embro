@@ -4,6 +4,7 @@ import com.migibert.embro.domain.model.Invitation;
 import com.migibert.embro.domain.model.Role;
 import com.migibert.embro.domain.model.User;
 import com.migibert.embro.domain.port.UserPort;
+import com.migibert.embro.infrastructure.persistence.model.tables.records.InvitationRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static com.migibert.embro.infrastructure.persistence.model.Tables.INVITATION;
 import static com.migibert.embro.infrastructure.persistence.model.Tables.USER_ORGANIZATION;
+import static org.jooq.impl.DSL.count;
 
 @Component
 public class UserAdapter implements UserPort {
@@ -61,11 +63,14 @@ public class UserAdapter implements UserPort {
     }
 
     @Override
-    public List<UUID> getOrganizationIds(String userId) {
-        return this.context
-                .selectFrom(USER_ORGANIZATION)
-                .where(USER_ORGANIZATION.USER_ID.eq(userId))
-                .fetch(USER_ORGANIZATION.ORGANIZATION_ID);
+    public Map<UUID, Role> getRolesByOrganizationIdForUser(String userId) {
+        Map<UUID, Role> result = new HashMap<>();
+         this.context
+            .selectFrom(USER_ORGANIZATION)
+            .where(USER_ORGANIZATION.USER_ID.eq(userId))
+            .fetch()
+            .map(record -> result.put(record.getOrganizationId(), Role.valueOf(record.getRole().getLiteral())));
+         return result;
     }
 
     public void createInvitation(Invitation invitation) {
@@ -84,6 +89,14 @@ public class UserAdapter implements UserPort {
     }
 
     @Override
+    public void deleteInvitationsByOrganizationId(UUID organizationId) {
+        this.context
+            .deleteFrom(INVITATION)
+            .where(INVITATION.ORGANIZATION_ID.eq(organizationId))
+            .execute();
+    }
+
+    @Override
     public Optional<Invitation> findInvitationById(UUID id) {
         return
             this.context
@@ -97,6 +110,17 @@ public class UserAdapter implements UserPort {
                    r.getOrganizationId(),
                    Role.valueOf(r.getRole().getLiteral())
                 ));
+    }
+
+    @Override
+    public List<Invitation> getInvitationsByOrganizationId(UUID id) {
+        return this.context
+                .selectFrom(INVITATION)
+                .where(INVITATION.ORGANIZATION_ID.eq(id))
+                .fetch()
+                .map(this::toDomainModel)
+                .stream()
+                .toList();
     }
 
     @Override
@@ -122,6 +146,30 @@ public class UserAdapter implements UserPort {
     }
 
     @Override
+    public Map<Role, Integer> userCountPerRole(UUID organizationId) {
+        Map<Role, Integer> result = new HashMap<>(Role.values().length);
+        this.context
+            .select(USER_ORGANIZATION.ROLE, count())
+            .from(USER_ORGANIZATION)
+            .where(USER_ORGANIZATION.ORGANIZATION_ID.eq(organizationId))
+            .groupBy(USER_ORGANIZATION.ROLE)
+            .fetch()
+            .stream()
+            .forEach(r -> result.put(Role.valueOf(r.component1().getLiteral()), r.component2()));
+        return result;
+    }
+
+    @Override
+    public Optional<User> getUser(UUID organizationId, String email) {
+        return this.context
+                    .selectFrom(USER_ORGANIZATION)
+                    .where(USER_ORGANIZATION.ORGANIZATION_ID.eq(organizationId))
+                    .and(USER_ORGANIZATION.USER_EMAIL.eq(email))
+                    .fetchOptional()
+                    .map(r -> new User(r.getUserEmail(), Role.valueOf(r.getRole().getLiteral())));
+    }
+
+    @Override
     public void updateUser(UUID organizationId, User user) {
         this.context
             .update(USER_ORGANIZATION)
@@ -129,5 +177,35 @@ public class UserAdapter implements UserPort {
             .where(USER_ORGANIZATION.USER_EMAIL.eq(user.email()))
             .and(USER_ORGANIZATION.ORGANIZATION_ID.eq(organizationId))
             .execute();
+    }
+
+    @Override
+    public String findUserIdByEmail(String email, UUID organizationId) {
+        return this.context
+                .select(USER_ORGANIZATION.USER_ID)
+                .from(USER_ORGANIZATION)
+                .where(USER_ORGANIZATION.USER_EMAIL.eq(email))
+                .and(USER_ORGANIZATION.ORGANIZATION_ID.eq(organizationId))
+                .fetchOne()
+                .component1();
+    }
+
+    @Override
+    public void deleteUserFromOrganization(String userId, UUID organizationId) {
+        this.context
+            .deleteFrom(USER_ORGANIZATION)
+            .where(USER_ORGANIZATION.USER_ID.eq(userId))
+            .and(USER_ORGANIZATION.ORGANIZATION_ID.eq(organizationId))
+            .execute();
+    }
+
+    private Invitation toDomainModel(InvitationRecord record) {
+        return new Invitation(
+            record.getId(),
+            record.getInvitedBy(),
+            record.getEmail(),
+            record.getOrganizationId(),
+            Role.valueOf(record.getRole().getLiteral())
+        );
     }
 }
