@@ -9,7 +9,7 @@ public record Collaborator(
         String email,
         String firstname,
         String lastname,
-        String role,
+        String position,
         LocalDate birthDate,
         LocalDate startDate,
         String seniority,

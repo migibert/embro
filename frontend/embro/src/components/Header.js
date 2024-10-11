@@ -6,11 +6,14 @@ import * as React from 'react';
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { OrganizationContext } from '../context/OrganizationContext';
+import { UserContext } from '../context/UserContext';
+import { getOrganizationColor } from '../utils/Colors';
 
 function Header() {
   const { user, isAuthenticated } = useAuth0();
-  const { organizations, currentOrganization, setCurrentOrganization } = useContext(OrganizationContext);
-  
+  const { currentOrganization, setCurrentOrganization } = useContext(OrganizationContext);
+  const { userInfos } = useContext(UserContext);  
+
   return (
     <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
       <Toolbar>
@@ -18,15 +21,18 @@ function Header() {
         EM Bro
         </Typography>
         <Stack spacing={2} direction='row'>
-          {organizations?.map((organization) =>
-          <Tooltip title={organization.name} key={organization.id}>
+          {userInfos?.map((userInfo) =>
+          <Tooltip title={userInfo.organization.name} key={userInfo.organization.id}>
             <Avatar
-              onClick={() => setCurrentOrganization(organization)}
-              sx={(currentOrganization === organization ? { border: '2px solid black', bgcolor: 'mediumpurple'} : null)}
+              onClick={() => setCurrentOrganization(userInfo.organization)}
+              sx={{
+                backgroundColor: getOrganizationColor(userInfo.organization.id, 60),
+                border: (currentOrganization.id === userInfo.organization.id ? '2px solid black' : 'none')
+              }}
               style={{cursor: 'pointer'}}
-              alt={organization.name}
+              alt={userInfo.organization.name}
             >
-              {organization.name.split(' ').map(i => i.charAt(0)).join('')}
+              {userInfo.organization.name.split(' ').map(i => i.charAt(0)).join('')}
             </Avatar>
           </Tooltip>
           )}

@@ -1,5 +1,6 @@
 package com.migibert.embro.infrastructure.controller;
 
+import com.migibert.embro.domain.model.Role;
 import com.migibert.embro.domain.model.Skill;
 import com.migibert.embro.domain.service.SkillService;
 import com.migibert.embro.domain.service.UserService;
@@ -23,7 +24,7 @@ public class SkillController {
     @GetMapping("/")
     public ResponseEntity list(Principal principal, @PathVariable("organizationId") UUID organizationId) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if(!userService.hasAnyRole(userId, organizationId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         Iterable<Skill> skills = service.findAll(organizationId);
@@ -33,7 +34,7 @@ public class SkillController {
     @GetMapping("/{id}")
     public ResponseEntity get(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if(!userService.hasAnyRole(userId, organizationId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         Optional<Skill> skill = service.findById(organizationId, id);
@@ -46,7 +47,7 @@ public class SkillController {
     @PostMapping("/")
     public ResponseEntity create(Principal principal, @PathVariable("organizationId") UUID organizationId, @RequestBody Skill skill) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if(!userService.hasRoleIn(userId, organizationId, Role.OWNER, Role.EDITOR)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if(skill.id() != null) {
@@ -59,7 +60,7 @@ public class SkillController {
     @DeleteMapping("/{id}")
     public ResponseEntity delete(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if(!userService.hasRoleIn(userId, organizationId, Role.OWNER, Role.EDITOR)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         service.delete(organizationId, id);

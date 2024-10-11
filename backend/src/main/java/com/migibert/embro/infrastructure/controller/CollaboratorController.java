@@ -1,6 +1,7 @@
 package com.migibert.embro.infrastructure.controller;
 
 import com.migibert.embro.domain.model.Collaborator;
+import com.migibert.embro.domain.model.Role;
 import com.migibert.embro.domain.service.CollaboratorService;
 import com.migibert.embro.domain.service.UserService;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,7 @@ public class CollaboratorController {
     @GetMapping("/")
     public ResponseEntity list(Principal principal, @PathVariable("organizationId") UUID organizationId) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if(!userService.hasAnyRole(userId, organizationId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         Iterable<Collaborator> collaborators = service.findAll(organizationId);
@@ -33,7 +34,7 @@ public class CollaboratorController {
     @GetMapping("/{id}")
     public ResponseEntity get(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if(!userService.hasAnyRole(userId, organizationId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         Optional<Collaborator> collaborator = service.findById(organizationId, id);
@@ -46,7 +47,7 @@ public class CollaboratorController {
     @PostMapping("/")
     public ResponseEntity create(Principal principal, @PathVariable("organizationId") UUID organizationId, @RequestBody Collaborator collaborator) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if(!userService.hasRoleIn(userId, organizationId, Role.OWNER, Role.EDITOR)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if(collaborator.id() != null) {
@@ -59,7 +60,7 @@ public class CollaboratorController {
     @PutMapping("/{id}")
     public ResponseEntity update(Principal principal, @PathVariable("organizationId") UUID organizationId, @RequestBody Collaborator collaborator) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if(!userService.hasRoleIn(userId, organizationId, Role.OWNER, Role.EDITOR)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if(collaborator.id() == null) {
@@ -72,7 +73,7 @@ public class CollaboratorController {
     @DeleteMapping("/{id}")
     public ResponseEntity delete(Principal principal, @PathVariable("organizationId") UUID organizationId, @PathVariable("id") UUID id) {
         String userId = principal.getName();
-        if(!userService.isAllowed(userId, organizationId)) {
+        if(!userService.hasRoleIn(userId, organizationId, Role.OWNER, Role.EDITOR)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         service.delete(organizationId, id);

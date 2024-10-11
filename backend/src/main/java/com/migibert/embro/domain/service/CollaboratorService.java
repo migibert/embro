@@ -23,7 +23,7 @@ public class CollaboratorService {
                 collaborator.email(),
                 collaborator.firstname(),
                 collaborator.lastname(),
-                collaborator.role(),
+                collaborator.position(),
                 collaborator.birthDate(),
                 collaborator.startDate(),
                 collaborator.seniority(),
@@ -48,8 +48,8 @@ public class CollaboratorService {
         return this.port.findByTeam(organizationId, teamId);
     }
 
-    public Set<Collaborator> findByRole(UUID organizationId, String roleName) {
-        return this.port.findByRole(organizationId, roleName);
+    public Set<Collaborator> findByPosition(UUID organizationId, String positionName) {
+        return this.port.findByPosition(organizationId, positionName);
     }
 
     public Set<Collaborator> findAll(UUID organizationId) {

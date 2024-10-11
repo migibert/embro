@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import com.migibert.embro.domain.model.Team;
 import com.migibert.embro.domain.port.TeamPort;
 import com.migibert.embro.infrastructure.persistence.model.tables.records.TeamRecord;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Slf4j
@@ -45,8 +46,17 @@ public class TeamAdapter implements TeamPort {
 
     }
 
+    @Transactional
     public void deleteById(UUID organizationId, UUID teamId) {
-        this.context.deleteFrom(TEAM).where(TEAM.ID.eq(teamId)).and(TEAM.ORGANIZATION_ID.eq(organizationId)).execute();
+        this.context.deleteFrom(TEAM_COLLABORATOR)
+                .where(TEAM_COLLABORATOR.TEAM_ID.eq(teamId))
+                .and(TEAM_COLLABORATOR.ORGANIZATION_ID.eq(organizationId))
+                .execute();
+        this.context
+                .deleteFrom(TEAM)
+                .where(TEAM.ID.eq(teamId))
+                .and(TEAM.ORGANIZATION_ID.eq(organizationId))
+                .execute();
     }
 
     public Optional<Team> findById(UUID organizationId, UUID teamId) {
@@ -117,7 +127,7 @@ public class TeamAdapter implements TeamPort {
                         COLLABORATOR.FIRSTNAME,
                         COLLABORATOR.LASTNAME,
                         COLLABORATOR.EMAIL,
-                        COLLABORATOR.ROLE,
+                        COLLABORATOR.POSITION,
                         COLLABORATOR.SENIORITY_NAME,
                         COLLABORATOR.START_DATE,
                         TEAM_COLLABORATOR.KEY_PLAYER
@@ -151,11 +161,11 @@ public class TeamAdapter implements TeamPort {
         String firstname = data.component2();
         String lastname = data.component3();
         String email = data.component4();
-        String role = data.component5();
+        String position = data.component5();
         String seniority = data.component6();
         LocalDate startDate = data.component7();
         Boolean keyPlayer = data.component8();
-        return new Member(collaboratorId, firstname, lastname, email, role, seniority, startDate, keyPlayer);
+        return new Member(collaboratorId, firstname, lastname, email, position, seniority, startDate, keyPlayer);
     }
 
     private Team toDomainModel(TeamRecord record) {

@@ -8,7 +8,7 @@ public record Member(
         String firstname,
         String lastname,
         String email,
-        String role,
+        String position,
         String seniority,
         LocalDate startDate,
         boolean keyPlayer) {

@@ -7,8 +7,9 @@ package com.migibert.embro.infrastructure.persistence.model;
 import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorSkillTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.CollaboratorTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.FlywaySchemaHistoryTable;
+import com.migibert.embro.infrastructure.persistence.model.tables.InvitationTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.OrganizationTable;
-import com.migibert.embro.infrastructure.persistence.model.tables.RoleTable;
+import com.migibert.embro.infrastructure.persistence.model.tables.PositionTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.SeniorityTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.SkillTable;
 import com.migibert.embro.infrastructure.persistence.model.tables.TeamCollaboratorTable;
@@ -19,7 +20,7 @@ import com.migibert.embro.infrastructure.persistence.model.tables.UserOrganizati
 /**
  * Convenience access to all tables in public.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
 
     /**
@@ -38,14 +39,19 @@ public class Tables {
     public static final FlywaySchemaHistoryTable FLYWAY_SCHEMA_HISTORY = FlywaySchemaHistoryTable.FLYWAY_SCHEMA_HISTORY;
 
     /**
+     * The table <code>public.invitation</code>.
+     */
+    public static final InvitationTable INVITATION = InvitationTable.INVITATION;
+
+    /**
      * The table <code>public.organization</code>.
      */
     public static final OrganizationTable ORGANIZATION = OrganizationTable.ORGANIZATION;
 
     /**
-     * The table <code>public.role</code>.
+     * The table <code>public.position</code>.
      */
-    public static final RoleTable ROLE = RoleTable.ROLE;
+    public static final PositionTable POSITION = PositionTable.POSITION;
 
     /**
      * The table <code>public.seniority</code>.

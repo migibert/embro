@@ -96,11 +96,11 @@ const listOrganizations = async (token) => {
     return _get(token, `${BASE_URL}/organizations/`);
 };
 
-const createOrganization = async (token, name) => {
+const createOrganization = async (token, organization) => {
     return _post(
         token, 
         `${BASE_URL}/organizations/`, 
-        JSON.stringify({id: null, name: name})
+        JSON.stringify(organization)
     );
 };
 
@@ -207,24 +207,55 @@ const createCollaborator = async (token, organizationId, collaborator) => {
     );
 };
 
-const listRoles = async (token, organizationId) => {
-    return _get(token, `${BASE_URL}/organizations/${organizationId}/roles/`);
+const listPositions = async (token, organizationId) => {
+    return _get(token, `${BASE_URL}/organizations/${organizationId}/positions/`);
 };
 
-const createRole = async (token, organizationId, name) => {
+const createPosition = async (token, organizationId, name) => {
     return _post(
         token, 
-        `${BASE_URL}/organizations/${organizationId}/roles/`,
+        `${BASE_URL}/organizations/${organizationId}/positions/`,
         JSON.stringify({id: null, name: name}));
 };
 
-const deleteRole = async (token, organizationId, roleId) => {
-    return _delete(token, `${BASE_URL}/organizations/${organizationId}/roles/${roleId}`);
+const deletePosition = async (token, organizationId, positionId) => {
+    return _delete(token, `${BASE_URL}/organizations/${organizationId}/positions/${positionId}`);
 }
 
+const acceptInvitation = async (token, invitationId) => {
+    return _get(token, `${BASE_URL}/invitations/${invitationId}`);
+}
+
+const createInvitation = async (token, email, organizationId, role) => {
+    return _post(token, `${BASE_URL}/invitations/`, JSON.stringify({email: email, organizationId: organizationId, role: role}));
+}
+
+const deleteInvitation = async (token, invitationId) => {
+    return _delete(token, `${BASE_URL}/invitations/${invitationId}`);
+}
+
+const listInvitations = async (token, organizationId) => {
+    return _get(token, `${BASE_URL}/invitations?organizationId=${organizationId}`);
+}
+
+const listUsers = async (token, organizationId) => {
+    return _get(token, `${BASE_URL}/organizations/${organizationId}/users/`);
+}
+
+const updateUser = async (token, organizationId, user) => {
+    return _put(token, `${BASE_URL}/organizations/${organizationId}/users/${user.email}`, JSON.stringify(user));
+}
+
+const deleteUser = async (token, organizationId, email) => {
+    return _delete(token, `${BASE_URL}/organizations/${organizationId}/users/${email}`);
+}
+
+const me = async (token) => {
+    return _get(token, `${BASE_URL}/me`);
+}
 
 export {
-    addTeamMember, createCollaborator, createOrganization, createRole, createSeniority, createSkill, createTeam, deleteCollaborator, deleteOrganization, deleteRole, deleteSeniority, deleteSkill, deleteTeam, getTeam,
-    listCollaborators, listOrganizations, listRoles, listSeniorities, listSkills, listTeamMembers, listTeams, removeTeamMember, updateCollaborator, updateTeam
+    acceptInvitation, addTeamMember, createCollaborator, createInvitation, createOrganization, createPosition, createSeniority, createSkill, createTeam, deleteCollaborator, deleteInvitation, deleteOrganization, deletePosition, deleteSeniority, deleteSkill, deleteTeam, deleteUser, getTeam,
+    listCollaborators, listInvitations, listOrganizations, listPositions, listSeniorities, listSkills, listTeamMembers, listTeams, listUsers, me, removeTeamMember, updateCollaborator, updateTeam, updateUser
 };
 

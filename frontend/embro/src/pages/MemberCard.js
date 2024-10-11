@@ -2,9 +2,8 @@ import { Delete, Star } from "@mui/icons-material";
 import { Card, CardActions, CardContent, CardHeader, IconButton, Tooltip, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
-function MemberCard({member, onDelete, backgroundColor}) {
+function MemberCard({member, onDelete, backgroundColor, disabled}) {
   const [collaborator, setCollaborator] = useState(member);
-
 
   const setKeyPlayer = async () => {
     setCollaborator({ ...collaborator, keyPlayer: !collaborator.keyPlayer });
@@ -34,20 +33,24 @@ function MemberCard({member, onDelete, backgroundColor}) {
         titleTypographyProps={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'wrap' }}
       >
       </CardHeader>
-      <CardContent>        
-        <Tooltip title={`${collaborator.seniority} ${collaborator.role}`}>
+      <CardContent>
+        <Tooltip title={`${collaborator.seniority} ${collaborator.position}`}>
           <Typography variant="body2" color="textSecondary">{collaborator.seniority}</Typography>
-          <Typography variant="body2" color="textSecondary">{collaborator.role}</Typography>
+          <Typography variant="body2" color="textSecondary">{collaborator.position}</Typography>
         </Tooltip>
       </CardContent>
       <CardActions 
-        sx={{
-          justifyContent: 'space-between'
-        }}>
-        <IconButton onClick={() => setKeyPlayer(!member.keyPlayer)}>
+        sx={{ justifyContent: 'space-between' }}>
+        <IconButton
+          disabled={disabled}
+          onClick={() => setKeyPlayer(!member.keyPlayer)}
+        >
           <Star />
         </IconButton>
-        <IconButton onClick={() => onDelete(collaborator)}>
+        <IconButton
+          disabled={disabled}
+          onClick={() => onDelete(collaborator)}
+        >
           <Delete />
         </IconButton>
       </CardActions>

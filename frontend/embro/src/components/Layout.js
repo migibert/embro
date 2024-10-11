@@ -1,6 +1,7 @@
 import { Box, CssBaseline, Drawer, ListItem, ListItemText, Toolbar } from '@mui/material';
-import React from 'react';
+import React, { useContext } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
+import { OrganizationContext } from '../context/OrganizationContext';
 import routes from '../utils/Routes';
 import Footer from './Footer';
 import Header from './Header';
@@ -8,6 +9,8 @@ import Header from './Header';
 const drawerWidth = 240;
 
 const Layout = () => {
+  const { currentOrganization } = useContext(OrganizationContext);
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <CssBaseline />
@@ -25,6 +28,7 @@ const Layout = () => {
           <Box sx={{ overflow: 'auto'}}>
             {routes
               .filter((route) => route.menu === true)
+              .filter((route) => currentOrganization || !route.requireOrganization)
               .map((item) => 
                 <ListItem button 
                   key={item.text} 

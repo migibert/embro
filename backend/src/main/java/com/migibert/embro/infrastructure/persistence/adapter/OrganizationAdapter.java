@@ -46,7 +46,7 @@ public class OrganizationAdapter implements OrganizationPort {
         this.context.deleteFrom(COLLABORATOR).where(COLLABORATOR.ORGANIZATION_ID.eq(organizationId)).execute();
         this.context.deleteFrom(SKILL).where(SKILL.ORGANIZATION_ID.eq(organizationId)).execute();
         this.context.deleteFrom(SENIORITY).where(SENIORITY.ORGANIZATION_ID.eq(organizationId)).execute();
-        this.context.deleteFrom(ROLE).where(ROLE.ORGANIZATION_ID.eq(organizationId)).execute();
+        this.context.deleteFrom(POSITION).where(POSITION.ORGANIZATION_ID.eq(organizationId)).execute();
         this.context.deleteFrom(USER_ORGANIZATION).where(USER_ORGANIZATION.ORGANIZATION_ID.eq(organizationId)).execute();
         this.context.deleteFrom(ORGANIZATION).where(ORGANIZATION.ID.eq(organizationId)).execute();
     }
@@ -72,7 +72,7 @@ public class OrganizationAdapter implements OrganizationPort {
     }
 
     @Override
-    public Set<Organization> findByIds(List<UUID> ids) {
+    public Set<Organization> findByIds(Set<UUID> ids) {
         return this.context.selectFrom(ORGANIZATION).where(ORGANIZATION.ID.in(ids)).stream().map(this::toDomainModel).collect(Collectors.toSet());
     }
 

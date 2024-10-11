@@ -5,7 +5,7 @@ import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import { Box, IconButton, List, ListItem, ListItemText, TextField } from "@mui/material";
 import { useState } from "react";
 
-function FieldsetList({title, items, onSave, onDelete}) {
+function FieldsetList({title, items, onSave, onDelete, disabled}) {
   const [name, setName] = useState(null);
   const [adding, setAdding] = useState(false);
 
@@ -17,7 +17,12 @@ function FieldsetList({title, items, onSave, onDelete}) {
           <ListItem 
             key={item.id}
             secondaryAction={
-              <IconButton edge="end" aria-label="delete" onClick={() => onDelete(item.id)}>
+              <IconButton 
+                edge="end"
+                aria-label="delete"
+                disabled={disabled}
+                onClick={() => onDelete(item.id)}
+              >
                 <Delete />
               </IconButton>
             }
@@ -27,20 +32,36 @@ function FieldsetList({title, items, onSave, onDelete}) {
         )}
       </List>
       {!adding && 
-      <IconButton onClick={() => setAdding(true)}>
+      <IconButton 
+        disabled={disabled}
+        onClick={() => setAdding(true)}
+      >
         <AddCircleIcon/>
       </IconButton>
       }
       {adding && 
       <Box>
-        <TextField required id="new-item-name" label="Name" variant="filled" onChange={(e) => setName(e.target.value)}/>
-        <IconButton onClick={() => {
-          onSave(name);
-          setAdding(false);
-        }}>
+        <TextField
+          required
+          id="new-item-name"
+          disabled={disabled}
+          label="Name"
+          variant="filled"
+          onChange={(e) => setName(e.target.value)}
+        />
+        <IconButton
+          disabled={disabled}
+          onClick={() => {
+            onSave(name);
+            setAdding(false);
+          }}
+        >
           <SaveRoundedIcon/>
         </IconButton>
-        <IconButton onClick={() => setAdding(false)}>
+        <IconButton
+          disabled={disabled}
+          onClick={() => setAdding(false)}
+        >
           <Cancel/>
         </IconButton>
       </Box>

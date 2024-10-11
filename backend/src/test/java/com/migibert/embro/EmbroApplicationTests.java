@@ -9,13 +9,21 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.AbstractOAuth2Token;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.client.RestTemplate;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -23,6 +31,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,10 +47,17 @@ class EmbroApplicationTests {
 	@Autowired
 	private MockMvc mvc;
 
+	@Value("${app.oauth2.userinfo.endpoint}")
+	private String userInfoEndpoint;
+	private MockRestServiceServer auth0Server;
+
 	@MockBean
 	private SecurityFilterChain mocked;
 
 	private Principal principal = () -> "test|rdm1234";
+
+	@Autowired
+	private RestTemplate template;
 
 	@Autowired
 	private ObjectMapper mapper;
@@ -47,7 +66,7 @@ class EmbroApplicationTests {
 	private Skill java;
 	private Skill decisionMaking;
 	private Skill projectManagement;
-	private Role softwareEngineer;
+	private Position softwareEngineer;
 	private Seniority junior;
 	private Seniority medium;
 	private Seniority senior;
@@ -56,6 +75,17 @@ class EmbroApplicationTests {
 
 	@BeforeAll
 	void setup() throws Exception {
+		auth0Server = MockRestServiceServer.createServer(template);
+		auth0Server.expect(requestTo(userInfoEndpoint)).andRespond(withSuccess("{\"email\":\"test@embro.io\"}", MediaType.APPLICATION_JSON));
+
+		AbstractOAuth2Token token = mock(AbstractOAuth2Token.class);
+		Authentication authentication = mock(Authentication.class);
+		SecurityContext context = mock(SecurityContext.class);
+		when(token.getTokenValue()).thenReturn("{\"email\": \"test@embro.io\"}");
+		when(authentication.getCredentials()).thenReturn(token);
+		when(context.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(context);
+
 		organization = createOrganization();
 
 		java = createSkill(organization, "Java");
@@ -66,7 +96,7 @@ class EmbroApplicationTests {
 		medium = createSeniority(organization, "Medium");
 		senior = createSeniority(organization, "Senior");
 
-		softwareEngineer = createRole(organization, "Software Engineer");
+		softwareEngineer = createPosition(organization, "Software Engineer");
 
 		team = createTeam(organization, "B2C");
 		mikael = create(
@@ -105,9 +135,9 @@ class EmbroApplicationTests {
 		return create("/organizations/" + organization.id() + "/seniorities/", seniority, Seniority.class);
 	}
 
-	private Role createRole(Organization organization, String name) throws Exception {
-		Role role = new Role(null, name);
-		return create("/organizations/" + organization.id() + "/roles/", role, Role.class);
+	private Position createPosition(Organization organization, String name) throws Exception {
+		Position position = new Position(null, name);
+		return create("/organizations/" + organization.id() + "/positions/", position, Position.class);
 	}
 	private Team createTeam(Organization organization, String name) throws Exception {
 		Team team = new Team(null, name, null, null, null, null);
@@ -136,7 +166,7 @@ class EmbroApplicationTests {
 		expectBodyToBe("/organizations/" + organization.id() + "/seniorities/" + junior.id(), junior, Seniority.class);
 		expectBodyToBe("/organizations/" + organization.id() + "/seniorities/" + medium.id(), medium, Seniority.class);
 		expectBodyToBe("/organizations/" + organization.id() + "/seniorities/" + senior.id(), senior, Seniority.class);
-		expectBodyToBe("/organizations/" + organization.id() + "/roles/" + softwareEngineer.id(), softwareEngineer, Role.class);
+		expectBodyToBe("/organizations/" + organization.id() + "/positions/" + softwareEngineer.id(), softwareEngineer, Position.class);
 		expectBodyToBe("/organizations/" + organization.id() + "/teams/" + team.id(), team, Team.class);
 		expectBodyToBe("/organizations/" + organization.id() + "/collaborators/" + mikael.id(), mikael, Collaborator.class);
 	}
@@ -156,7 +186,7 @@ class EmbroApplicationTests {
 		Assertions.assertEquals(mikael.firstname(), found.firstname());
 		Assertions.assertEquals(mikael.lastname(), found.lastname());
 		Assertions.assertEquals(mikael.email(), found.email());
-		Assertions.assertEquals(mikael.role(), found.role());
+		Assertions.assertEquals(mikael.position(), found.position());
 		Assertions.assertEquals(mikael.seniority(), found.seniority());
 		Assertions.assertEquals(mikael.startDate(), found.startDate());
 		Assertions.assertEquals(dto.keyPlayer(), found.keyPlayer());

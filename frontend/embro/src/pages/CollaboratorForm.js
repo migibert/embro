@@ -7,23 +7,23 @@ import utc from "dayjs/plugin/utc";
 
 import { useContext, useEffect, useState } from "react";
 import { OrganizationContext } from "../context/OrganizationContext";
-import { listRoles, listSeniorities, listSkills } from "../utils/api";
+import { listPositions, listSeniorities, listSkills } from "../utils/api";
 
-function CollaboratorForm({ collaborator, onSave, onCancel }) {
+function CollaboratorForm({ collaborator, onSave, onCancel, disabled }) {
   const { getAccessTokenSilently } = useAuth0();
   const { currentOrganization} = useContext(OrganizationContext);
 
   const [ email, setEmail ] = useState(collaborator?.email);
   const [ firstname, setFirstname ] = useState(collaborator?.firstname);
   const [ lastname, setLastname ] = useState(collaborator?.lastname);
-  const [ role, setRole ] = useState(collaborator?.role);
+  const [ position, setPosition ] = useState(collaborator?.position);
   const [ birthDate, setBirthDate ] = useState(collaborator?.birthDate ? dayjs(collaborator.birthDate) : null);
   const [ startDate, setStartDate ] = useState(collaborator?.startDate ? dayjs(collaborator.startDate) : null);
   const [ seniority, setSeniority ] = useState(collaborator?.seniority);
   const [ skillLevels, setSkillLevels ] = useState(collaborator?.skills || []);
   const [ availableSkills, setAvailableSkills] = useState([]);
   const [ availableSeniorities, setAvailableSeniorities] = useState([]);
-  const [ availableRoles, setAvailableRoles] = useState([]);
+  const [ availablePositions, setAvailablePositions] = useState([]);
 
   dayjs.extend(utc);
 
@@ -34,10 +34,10 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
       }
       const token = await getAccessTokenSilently();
       const loadedSkills = await listSkills(token, currentOrganization.id);
-      const loadedRoles = await listRoles(token, currentOrganization.id);
+      const loadedPositions = await listPositions(token, currentOrganization.id);
       const loadedSeniorities = await listSeniorities(token, currentOrganization.id);
       setAvailableSkills(loadedSkills.filter(s => !skillLevels.find(sl => sl.skill.id === s.id)));
-      setAvailableRoles(loadedRoles);
+      setAvailablePositions(loadedPositions);
       setAvailableSeniorities(loadedSeniorities);
     }
     load();
@@ -49,7 +49,7 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
       email: email,
       firstname: firstname,
       lastname: lastname,
-      role: role,
+      position: position,
       birthDate: birthDate?.utc().toDate(),
       startDate: startDate?.utc().toJSON(),
       seniority: seniority,
@@ -68,6 +68,7 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
           <legend>Personal Information</legend>
           <Stack sx={{ m: 2 }} direction={"row"} spacing={3}>
             <TextField
+              disabled={disabled}
               required
               fullWidth
               label="First Name"
@@ -75,6 +76,7 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
               onChange={(e) => setFirstname(e.target.value)}
             />
             <TextField
+              disabled={disabled}
               required
               fullWidth
               label="Last Name"
@@ -82,6 +84,7 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
               onChange={(e) => setLastname(e.target.value)}
             />
             <TextField
+              disabled={disabled}
               fullWidth
               required
               label="Email"
@@ -92,6 +95,7 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
           <Stack sx={{ m: 2 }} direction={"row"} spacing={3}>
             <Select
               sx={{ width: "50%" }}
+              disabled={disabled}
               required
               value={seniority}
               label="Seniority"
@@ -105,15 +109,16 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
             </Select>
             <Select
               sx={{ width: "50%" }}
+              disabled={disabled}
               required
-              value={role}
-              defaultValue={availableRoles[0]}
-              label="Role"
-              onChange={(e) => setRole(e.target.value)}
+              value={position}
+              defaultValue={availablePositions[0]}
+              label="Position"
+              onChange={(e) => setPosition(e.target.value)}
             >
-              {availableRoles?.map((role) => (
-                <MenuItem key={role.name} value={role.name}>
-                  {role.name}
+              {availablePositions?.map((position) => (
+                <MenuItem key={position.name} value={position.name}>
+                  {position.name}
                 </MenuItem>
               ))}
             </Select>
@@ -121,12 +126,14 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
           <Stack sx={{ m: 2 }} direction={"row"} spacing={3}>
             <DatePicker
               sx={{ width: "50%" }}
+              disabled={disabled}
               label="Birth Date"
               value={birthDate}
               onChange={(newValue) => setBirthDate(newValue)}
             />
             <DatePicker
               sx={{ width: "50%" }}
+              disabled={disabled}
               label="Start Date"
               value={startDate}
               onChange={(newValue) => setStartDate(newValue)}
@@ -143,7 +150,11 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
               }
             >
               {availableSkills?.map((skill) => (
-                <ListItem key={skill.id} button onClick={() => {
+                <ListItem
+                  key={skill.id}
+                  disabled={disabled}
+                  button
+                  onClick={() => {
                     setSkillLevels([...skillLevels, { skill: skill, proficiency: 0 }]);
                     setAvailableSkills(availableSkills.filter(s => s.id !== skill.id));
                   }}>
@@ -163,16 +174,20 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
                   <Rating
                     name={skillLevel.skill.id}
                     value={skillLevel.proficiency}
+                    disabled={disabled}
                     onChange={(_, newValue) => {
                       skillLevel.proficiency = newValue;
                       setSkillLevels([...skillLevels]);
                     }}
                   />
-                  <ListItemIcon>
-                    <Delete onClick={() => {
+                  <ListItemIcon 
+                    disabled={disabled}
+                    onClick={() => {
                       setSkillLevels(skillLevels.filter(s => s.skill.id !== skillLevel.skill.id));
                       setAvailableSkills([...availableSkills, skillLevel.skill]);
-                    }}/>
+                    }
+                  }>
+                    <Delete />
                   </ListItemIcon>
                 </ListItem>
               ))}
@@ -181,10 +196,20 @@ function CollaboratorForm({ collaborator, onSave, onCancel }) {
         </Box>
       </Stack>
       <Stack direction={"row"} spacing={2}>
-        <Button variant="contained" color="success" onClick={save}>
+        <Button
+          disabled={disabled}
+          variant="contained"
+          color="success"
+          onClick={save}
+        >
           Save
         </Button>
-        <Button variant="outlined" color="error" onClick={onCancel}>
+        <Button
+          disabled={disabled}
+          variant="outlined"
+          color="error"
+          onClick={onCancel}
+        >
           Cancel
         </Button>
       </Stack>

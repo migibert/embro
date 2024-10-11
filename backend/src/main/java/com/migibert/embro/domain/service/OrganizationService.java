@@ -36,7 +36,7 @@ public class OrganizationService {
         return this.port.findAll();
     }
 
-    public Set<Organization> findByIds(List<UUID> ids) {
+    public Set<Organization> findByIds(Set<UUID> ids) {
         return this.port.findByIds(ids);
     }
 }

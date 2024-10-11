@@ -16,5 +16,5 @@ public interface OrganizationPort {
 
     List<Organization> findAll();
 
-    Set<Organization> findByIds(List<UUID> ids);
+    Set<Organization> findByIds(Set<UUID> ids);
 }

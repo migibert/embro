@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { OrganizationContext } from "../context/OrganizationContext";
 
-function TeamCard({team, onDelete, onSave, onCancel}) {
+function TeamCard({team, onDelete, onSave, onCancel, disabled}) {
   const { currentOrganization } = useContext(OrganizationContext);
   const [editMode, setEditMode] = useState(false);
   const [name, setName] = useState(team.name);
@@ -40,38 +40,38 @@ function TeamCard({team, onDelete, onSave, onCancel}) {
   }
 
   return (
-    <Card sx={{ 
-      width: 200, 
+    <Card sx={{
+      width: 250,
       height: 200,
       justifyContent: 'space-between',
-      textAlign: 'center', 
+      textAlign: 'center',
       backgroundColor: `hsl(${Math.random()*360}, 25%, 90%)` ,
       display: 'flex',
       flexDirection: 'column',
     }}>
       <CardHeader 
-        title={editMode === false ? team.name : <TextField size="small" value={name} onChange={(e) => setName(e.target.value)} />}
+        title={editMode === false ? team.name : <TextField disabled={disabled} size="small" value={name} onChange={(e) => setName(e.target.value)} />}
         titleTypographyProps={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'wrap', fontSize: '1.3em' }}
-        action={
-          editMode && <>
-            <IconButton onClick={() => save()}>
-              <Save />
-            </IconButton>
-            <IconButton onClick={() => cancel()}>
-              <Cancel />
-            </IconButton>
-          </>
-        }
       />
       <CardActions sx={{ justifyContent: 'space-between'}}>
-        <Link to={`/teams/${team?.id}`}>
-          <IconButton disabled={!team?.id}>
-            <Info/>
+        {editMode && <>
+          <IconButton disabled={disabled} onClick={() => save()}>
+            <Save />
           </IconButton>
-        </Link>
-        <IconButton disabled={!team?.id} onClick={() => onDelete(team)}>
-          <Delete/>
-        </IconButton>
+          <IconButton disabled={disabled} onClick={() => cancel()}>
+            <Cancel />
+          </IconButton>
+        </>}
+        {!editMode && <>
+          <Link to={`/teams/${team?.id}`}>
+            <IconButton disabled={!team?.id}>
+              <Info/>
+            </IconButton>
+          </Link>
+          <IconButton disabled={!team?.id || disabled} onClick={() => onDelete(team)}>
+            <Delete/>
+          </IconButton>
+        </>}
       </CardActions>
     </Card>
   );
